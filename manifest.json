@@ -1,33 +1,13 @@
 {
-    "name": "1701735549",
-    "description": "Web端装扮工具",
-    "version": "0.0.1",
+    "name": "1701735549 beta",
+    "description": "Web端装扮工具 beta",
+    "version": "0.0.0",
     "manifest_version": 3,
-    "options_page": "options/options.html",
     "permissions": [
         "tabs", 
         "downloads",
         "storage",
         "contextMenus"
-    ],
-    "background": {
-        "service_worker": "background.js",
-        "type": "module"
-    },
-    "action": {
-        "default_popup": "action/suit.html",
-        "default_title": "玉玉了",
-        "default_icon": "assets/icons/popup.png"
-    },
-    "content_scripts": [
-        {
-            "js": [
-                "content.js"
-            ],
-            "matches": [
-                "*://*.bilibili.com/*"
-            ]
-        }
     ],
     "icons": {
         "16": "assets/icons/16x16.png",
@@ -35,5 +15,36 @@
         "48": "assets/icons/48x48.png",
         "128": "assets/icons/128x128.png"
     },
+    "background": {
+        "service_worker": "background/background.js",
+        "type": "module"
+    },
+    "host_permissions": ["*://*/*"],
+    "action": {
+        "default_popup": "action/popup.html",
+        "default_title": "玉玉了",
+        "default_icon": "assets/icons/popup.png"
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "/assets/lib/request.js",
+                "/content/api.js"
+            ],
+            "matches": [
+                "*://*.bilibili.com/*"
+            ]
+        },
+        {
+            "js": [
+                "/content/chrome.js",
+                "/content/scammer.js"
+            ],
+            "matches": [
+                "*://space.bilibili.com/*"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
     "homepage_url": "https://github.com/lllk140/ChromeBilibiliSuitHelper"
 }

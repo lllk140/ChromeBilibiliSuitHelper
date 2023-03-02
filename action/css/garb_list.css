@@ -1,0 +1,196 @@
+@font-face {
+    font-family: "fansCard";
+    src:url("/assets/fonts/fansCard.ttf");
+}
+
+body {
+    margin: 5px;
+    background-color: #202020;
+    width: 305px;
+}
+
+.title, .content {
+    position: relative;
+}
+
+.title {
+    height: 25px;
+    width: 100%;
+    transition: 300ms;
+}
+
+#back, #search, #sort {
+    background: transparent;
+    float: left;
+    border-style: none;
+    outline: none;
+    user-select: none;
+    font-size: 14px;
+}
+
+#back {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+#back img {
+    user-select: none;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 0;
+    left: 0;
+}
+
+#search {
+    height: 23px;
+    width: 230px;
+    color: white;
+    font-weight: bold;
+}
+
+#sort {
+    height: 25px;
+    width: 46px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+/* ---------------------------------------------- */
+
+.content {
+    width: 305px;
+    height: 550px;
+    overflow: auto;
+}
+
+.content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    width: 5px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------- */
+
+#garb_list {
+    list-style: none;
+    font-size: 0;
+}
+
+#garb_list li {
+    font-size: 16px;
+    width: 300px;
+    margin: 5px 0;
+    border-radius: 10px;
+    position: relative;
+    right: 40px;
+    cursor: pointer;
+}
+
+#garb_list li img {
+    width: 300px;
+    height: 123px;
+    background-size: cover;
+    object-fit: cover;
+    user-select: none;
+    border-radius: 10px;
+}
+
+/* ---------------------------------------------- */
+
+#garb_list li span {
+    position: absolute;
+    user-select: none;
+    display: block;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0);
+}
+
+#garb_list li span:nth-child(1) {
+    left: 10px;
+    top: 10px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#garb_list li span:nth-child(2) {
+    left: 10px;
+    top: 40px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+    background: transparent;
+}
+
+#garb_list li span:nth-child(3) {
+    left: 10px;
+    top: 60px;
+    color: white;
+    font-size: 16px;
+    font-family: "fansCard", serif;
+}
+
+#garb_list li span:nth-child(4) {
+    left: 10px;
+    top: 80px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    background: transparent;
+    font-weight: bold;
+}
+
+#garb_list li span:nth-child(5) {
+    left: 10px;
+    top: 95px;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+}
+
+#garb_list li span:nth-child(6) {
+    background-color: rgba(0, 0, 0, 0.8);
+    font-family: "fansCard", serif;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+    font-size: 14px;
+    width: 45px;
+    color: white;
+    right: 10px;
+    bottom: 12px;
+}
+
+/* ---------------------------------------------- */
+
+#console {
+    position: absolute;
+    top: 5px; left: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#console-back {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    background: transparent;
+}
+
+#console-back img {
+    user-select: none;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 0;
+    left: 0;
+}

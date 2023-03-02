@@ -1,17 +1,4 @@
-function contentPage(reqkey, value) {
-    // 和content.js 交互
-    return new Promise(function (resolve, _) {
-        const con = {currentWindow: true, active: true};
-        chrome.tabs.query(con, function(tabs) {
-            const data = {key: reqkey, value: value};
-            chrome.tabs.sendMessage(tabs[0].id, data, function(res) {
-                resolve(res);
-            });
-        });
-    });
-}
-
-function setLocalContent(content) {
+export function saveStorage(content) {
     // 保存数据到本地
     return new Promise(function (resolve, _) {
         chrome.storage.local.set(content, function() {
@@ -20,11 +7,34 @@ function setLocalContent(content) {
     });
 }
 
-function getLocalContent(key, exp={}) {
+export function getStorage(key, err={}) {
     // 获取本地数据
     return new Promise(function (resolve, _) {
         chrome.storage.local.get([key], function(value) {
-            resolve(value[key] || exp);
+            resolve(value[key] || err);
+        });
+    });
+}
+
+export function backgroundPage(func_name, value) {
+    // 和 background.js 交互
+    return new Promise(function (resolve, _) {
+        const data = {key: func_name, value: value};
+        chrome.runtime.sendMessage(data, function(res) {
+            resolve(res);
+        })
+    })
+}
+
+export function contentPage(func_name, value) {
+    // 和content.js 交互
+    return new Promise(function (resolve, _) {
+        const con = {currentWindow: true, active: true};
+        chrome.tabs.query(con, function(tabs) {
+            const data = {key: func_name, value: value};
+            chrome.tabs.sendMessage(tabs[0].id, data, function(res) {
+                resolve(res);
+            });
         });
     });
 }

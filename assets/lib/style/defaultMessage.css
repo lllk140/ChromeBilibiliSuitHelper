@@ -1,0 +1,42 @@
+.MessageDialog {
+    border: 2px solid #606060;
+    background: #202020;
+    border-radius: 10px;
+    position: absolute;
+    max-width: 300px;
+    outline: none;
+}
+
+.MessageDialog button {
+    position: relative;
+    outline: none;
+    user-select: none;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-top: 10px;
+    float: right;
+    bottom: 0;
+    width: auto;
+    min-width: 45px;
+    height: 25px;
+    background: transparent;
+    color: rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+}
+
+/* ---------------------------------------------------- */
+
+.MessageInfo {
+    position: absolute;
+    text-align: center;
+    height: auto;
+    opacity: 0;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: #606060;
+    color: #ffffff;
+    max-width: 260px;
+}

@@ -1,97 +1,40 @@
-// https://oyzq.github.io/drag_sort/%E6%8B%96%E6%8B%BD%E6%8E%92%E5%BA%8F.html
-// https://github.com/OYZQ/drag_sort
-
-
-function getIndex(el) {
-    // 获取标签位置
-    let index = 0
-    if (!el || !el.parentNode) {
-        return -1
-    }
-    while (el && (el = el.previousElementSibling)) {
-        index++
-    }
-    return index
-}
-
-class SortAnimation {
-    // 排序动画
-    static sortCss(el, prop, val) {
-        let style = el && el.style;
-
-        if (style) {
-            if (val === void 0) {
-                if (document.defaultView && document.defaultView.getComputedStyle) {
-                    val = document.defaultView.getComputedStyle(el, '');
-                } else if (el["currentStyle"]) {
-                    val = el["currentStyle"];
-                }
-                return prop === void 0 ? val : val[prop];
-            } else {
-                if (!(prop in style)) {
-                    prop = '-webkit-' + prop;
-                }
-                style[prop] = val + (typeof val === 'string' ? '' : 'px')
-            }
-        }
-    }
-
-    static sortAnimate(prevRect, target, timeout=300) {
-        let currentRect = target.getBoundingClientRect()
-        if (prevRect.nodeType === 1) {
-            prevRect = prevRect.getBoundingClientRect()
-        }
-        SortAnimation.sortCss(target, 'transition', 'none')
-        SortAnimation.sortCss(target, 'transform', 'translate3d(' +
-            (prevRect.left - currentRect.left) + 'px,' +
-            (prevRect.top - currentRect.top) + 'px,0)'
-        );
-
-        target.offsetWidth;
-
-        SortAnimation.sortCss(target, 'transition', 'all ' + timeout + 'ms');
-        SortAnimation.sortCss(target, 'transform', 'translate3d(0,0,0)');
-
-        clearTimeout(target.animated);
-        target.animated = setTimeout(function() {
-            SortAnimation.sortCss(target, 'transition', '');
-            SortAnimation.sortCss(target, 'transform', '');
-            target.animated = false;
-        }, timeout);
-    }
-}
-
-class MessageAnimation {
+export class MessageAnimation {
+    // 对话框动画
     constructor(window, detail, type="info") {
-        document.body.appendChild(window);
+        // 添加到html页面中
+        document.body.append(window);
 
         this.window = window;
         this.detail = detail;
 
+        // 计算上浮参数
         const spanStep = this.detail["spanStep"] || 10;
-
         this.span = document.body.clientHeight / spanStep;
-        this.opacity = 0;
 
+        // 计算显示参数
         this.show_time = this.detail["ShowTime"] || 300;
         this.show_step = this.detail["ShowStep"] || 50;
         this.show_opacity_step = 1 / this.show_step;
         this.show_timeout = this.show_time / this.show_step;
 
+        // 计算消失参数
         this.hide_time = this.detail["HideTime"] || 300;
         this.hide_step = this.detail["HideStep"] || 50;
         this.hide_opacity_step = 1 / this.hide_step;
         this.hide_timeout = this.hide_time / this.hide_step;
 
+        // 计算初始位置
         let StartTop = this.span + (detail["offset"] || 0);
         const obj = this.getTopAndLeft(window);
         if (type === "info") {
             StartTop = obj.top + this.span + (this.detail["offset"] || 0);
             this.window.style.left = obj.left.toString() + "px";
         }
+        // 应用初始位置
         this.window.style.top = StartTop.toString() + "px";
 
         this.top = StartTop;
+        this.opacity = 0;
         this.type = type;
     }
 
@@ -114,63 +57,52 @@ class MessageAnimation {
         this.window.style.top = this.top.toString() +"px";
     }
 
-    async changeWindow(method="show") {
+    changeWindow(method="show") {
         // 改变窗口动画
-        let timer = null;
         let method_number, timeout, step, opacity_step;
-
-        if (method !== "show" && method !== "hide") {
-            throw new Error("method is error");
-        }
 
         opacity_step = (method === "show") ? this.show_opacity_step: this.hide_opacity_step;
         timeout = (method === "show") ? this.show_timeout: this.hide_timeout;
         step = (method === "show") ? this.show_step: this.hide_step;
         method_number = (method === "show") ? 1: -1;
 
-        function change(self) {
-            self.changeStyle(opacity_step, step, method_number)
+        function handler(self) {
+            self.changeStyle(opacity_step, step, method_number);
             if (self.opacity >= 1 && method === "show") {
-                clearTimeout(timer);
+                clearInterval(timer);
                 return false;
             }
-
             if (self.opacity <= 0 && method === "hide") {
-                clearTimeout(timer);
+                clearInterval(timer);
                 if (self.type !== "info") {
                     self.window.close();
                 }
                 document.body.removeChild(self.window);
                 return false;
             }
-            timer = setTimeout(function() {
-                change(self);
-            }, timeout)
         }
-        return change(this);
+        let timer = setInterval(handler, timeout, this);
+        return handler(this);
+    }
+
+    waitButton(button, title, time) {
+        // 等待按钮
+        let i = Math.floor(time / 1000);
+        function handler() {
+            button.innerText = i.toString();
+            button.style.cursor = "default";
+            button.disabled = true;
+            if (i <= 0) {
+                clearInterval(timer);
+                button.disabled = false;
+                button.innerText = title;
+                button.style.cursor = "pointer";
+                return false;
+            }
+            i -= 1;
+        }
+        let timer = setInterval(handler, 1000);
+        return handler();
     }
 }
 
-async function waitButton(button, title, time) {
-    // 等待按钮
-    let wait_time = time || 0;
-    let timer = null;
-    let i = Math.floor(wait_time / 1000);
-    function change() {
-        button.innerText = i.toString();
-        button.disabled = true;
-
-        if (i <= 0) {
-            clearTimeout(timer);
-            button.disabled = false;
-            button.innerText = title;
-            button.style.cursor = "pointer";
-            return false;
-        }
-        timer = setTimeout(function() {
-            change();
-        }, 1000);
-        i -= 1;
-    }
-    return change();
-}

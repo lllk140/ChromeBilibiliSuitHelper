@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/assets/lib/style/defaultMessage.css">
+    <link rel="stylesheet" href="css/garb_list.css">
+    <title>garb_list.html</title>
+</head>
+<body>
+    <div class="title">
+        <button id="back">
+            <img src="/assets/icons/back.png" alt="返回">
+        </button>
+        <input id="search" type="text" placeholder="搜索" title="搜索栏用法参考文档">
+        <input id="sort" type="button" value="排序" title="???">
+    </div>
+    <div class="content" id="content">
+        <ul id="garb_list"></ul>
+    </div>
+    <div id="console" style="display: none">
+        <div class="title">
+            <button id="console-back">
+                <img src="/assets/icons/back.png" alt="关闭">
+            </button>
+        </div>
+        <input type="button" value="反转列表">
+        <input type="button" value="更新列表">
+    </div>
+    <script src="js/gard_list.js" type="module"></script>
+</body>
+</html>
