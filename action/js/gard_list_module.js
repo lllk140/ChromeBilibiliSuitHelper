@@ -176,13 +176,11 @@ export const searchApi = {
         // 字符串搜索
         const items = GetCardItems();
         const search_list = [];
-        let n = 0;
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             const data = key in item ? item[key] : item["name"];
             if (data.toString().indexOf(value.toString()) !== -1) {
-                search_list[n] = item;
-                n += 1;
+                search_list.push(item);
             }
         }
         return search_list
@@ -216,22 +214,76 @@ export const searchApi = {
         }
 
         const search_list = [];
-        let n = 0;
 
         const items = GetCardItems();
         for (let i = 0; i < items.length; i++) {
             const item = items[i]
             item["date"] = new Date(item["date"]).getTime() / 1000;
-            const searchKey = item[key] || items["date"];
+            const searchKey = item[key] || items["number"];
             // console.log(searchKey, search_header, search_tail);
 
             if (search_header <= searchKey && searchKey <= search_tail) {
                 // (1 <= 3 <= 2) == true //js很神奇吧
-                search_list[n] = item;
-                n += 1;
+                search_list.push(item);
             }
         }
 
         return search_list
     }
+}
+
+function createCodeTipsList() {
+    const searchCodeList = [":searchString:", ":searchNumber:"]
+
+    let codeTipsList = [];
+    codeTipsList.push.apply(codeTipsList, searchCodeList);
+
+    // console xxx
+    codeTipsList.push(":console:ui:");
+
+    const root = document.getElementById("garb_list");
+    if (root.children.length === 0) {
+        return codeTipsList;
+    }
+
+    const item = JSON.parse(root.children[0].dataset["item"]);
+    for (const itemKey in item) {
+        for (let i = 0; i < searchCodeList.length; i++) {
+            codeTipsList.push(searchCodeList[i] + itemKey + ":[]");
+        }
+    }
+
+    return codeTipsList;
+}
+
+export function createCodeTips(value, key, input, resList=[]) {
+    const codeList = createCodeTipsList();
+
+    if (key === "Tab" && resList.length !== 0) {
+        console.log("res", resList[0]);
+        input.value = resList[0];
+        let timer = setInterval(function() {
+            // 6
+            if (input.value === resList[0]) {
+                clearInterval(timer);
+                input.focus();
+                if (input.value.slice(input.value.length - 2) === "[]") {
+                    const startR = input.selectionStart - 1;
+                    const EndR = input.selectionEnd - 1;
+                    input.setSelectionRange(startR, EndR);
+                }
+            }
+        }, 50);
+        return []
+    }
+
+    resList = [];
+
+    for (let i = 0; i < codeList.length; i++) {
+        if (codeList[i].indexOf(value) !== -1) {
+            resList.push(codeList[i]);
+        }
+    }
+
+    return resList
 }

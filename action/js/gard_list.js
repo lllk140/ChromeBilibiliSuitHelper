@@ -1,4 +1,4 @@
-import {StartLoad, searchApi} from "/action/js/gard_list_module.js";
+import {StartLoad, searchApi, createCodeTips} from "/action/js/gard_list_module.js";
 
 
 window.onload = StartLoad;
@@ -18,6 +18,7 @@ document.getElementById("sort").onclick = function() {
 (async function() {
     let old_code = null;
     let search_list = [];
+    let code_list = [];
 
     function searchNext() {
         if (search_list.length === 0) {
@@ -29,11 +30,20 @@ document.getElementById("sort").onclick = function() {
         return true;
     }
 
-    document.getElementById("search").onkeydown = async function(event) {
+    document.getElementById("search").onkeydown = function(event) {
         const value = this.value.toString();
 
-        if (!value || event.key !== "Enter") {
-            return null;
+        if (!value) {
+            return true;
+        }
+
+        if (event.key !== "Enter") {
+            if (event.key === "Tab" && code_list.length === 0) {
+                return false;
+            }
+            code_list = createCodeTips(value, event.key, this, code_list);
+            console.log(code_list);
+            return true;
         }
 
         if (value !== old_code) {
@@ -41,7 +51,7 @@ document.getElementById("sort").onclick = function() {
             search_list = [];
         } else {
             if (searchNext()) {
-                return null;
+                return false;
             }
         }
 
@@ -59,15 +69,11 @@ document.getElementById("sort").onclick = function() {
             searchValueArray = ["search", reSearchValue];
         }
 
-        // console.log(handlerKey);
-        // console.log(funcKey);
-        // console.log(searchValueArray);
-
         // 控制台
         if (handlerKey === "console" && funcKey ==="ui") {
             const root = document.getElementById("console");
             root.style.display = "block";
-            return null;
+            return false;
         }
 
         // 搜索
@@ -78,11 +84,9 @@ document.getElementById("sort").onclick = function() {
             const handlerFunc = searchApi[handlerKey];
             search_list = handlerFunc(funcKey, searchValueArray[1]);
 
-            // console.log(search_list);
-
             return searchNext();
         }
 
-        return null;
+        return true;
     }
 })();
