@@ -1,7 +1,8 @@
-import {StartLoad, searchApi, searchCodeTips, setInputValue} from "/action/js/gard_list_module.js";
+import {StartLoad, setInputValue, inputApi} from "/action/js/gard_list_module.js";
 
 
 window.onload = StartLoad;
+
 
 document.getElementById("back").onclick = function() {
     // 返回上一页
@@ -28,7 +29,6 @@ window.onclick = function(event) {
 (async function() {
     let old_code = null;
     let search_list = [];
-    let code_list = [];
 
     function onFocus(eid, func=function(_) {}) {
         // 监听光标信息
@@ -48,10 +48,10 @@ window.onclick = function(event) {
                 return null;
             }
 
-            if (root !== document.activeElement) {
-                tips.dataset["style"] = "hide";
-                return null;
-            }
+            // if (root !== document.activeElement) {
+            //     tips.dataset["style"] = "hide";
+            //     return null;
+            // }
 
             if (selectionStart === start && selectionEnd === end) {
                 return null;
@@ -78,14 +78,59 @@ window.onclick = function(event) {
         const _le = event.location.e;
         const _value = event.root.value;
 
-        const value = _ls === _le ? _value.slice(0, _le) : _value.slice(_ls, _le);
+        let value = _ls === _le ? _value.slice(0, _le) : _value.slice(_ls, _le);
 
-        let code_list = searchCodeTips(value);
-        if (code_list.length !== 0) {
-            if (code_list[0] === event.root.value) {
-                code_list = code_list.slice(1);
+        if (value[0] !== "@") {
+            return null;
+        }
+
+        const valueSplit = value.slice(1).split(":");
+
+        console.log("code:", valueSplit);
+
+        const code_node = [];
+        let header = [];
+        let copyApi = inputApi;
+        if (valueSplit.length === 1) {
+            for (const code in inputApi) {
+                code_node.push(code);
+            }
+        } else {
+            header = valueSplit.slice(0, -1);
+            for (let i = 0; i < header.length; i++) {
+                const key = header[i];
+                if (!copyApi[key]) {
+                    return []
+                }
+                if (copyApi[key] instanceof Object) {
+                    copyApi = copyApi[key];
+                } else {
+                    return []
+                }
+            }
+
+            for (const code in copyApi) {
+                code_node.push(code);
             }
         }
+
+        let tail = valueSplit.slice(-1)[0];
+        const code_list = []
+
+        for (let i = 0; i < code_node.length; i++) {
+            const code = code_node[i].slice(0, tail.length);
+            if (code === tail) {
+                const joinText = header.join(":");
+                const node = !joinText ? "" : joinText + ":";
+
+                let tailText = ":";
+                if (typeof copyApi[code_node[i]] === "function") {
+                    tailText = "@[]";
+                }
+                code_list.push(`@${node}${code_node[i]}${tailText}`);
+            }
+        }
+
         const page_code_list = code_list.slice(0, 5);
 
         tips.innerHTML = "";
@@ -116,7 +161,7 @@ window.onclick = function(event) {
     }
 
     document.getElementById("search").onkeydown = function(event) {
-        const value = this.value.toString();
+        let value = this.value.toString();
         if (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Tab") {
             event.preventDefault();
             return false;
@@ -135,35 +180,38 @@ window.onclick = function(event) {
             }
         }
 
-        const reString = value.match(/:(.*?):(.*?):/) || ["", "search", "name"];
+        console.log("onkeydown:", value);
 
-        // 处理方法
-        // 搜索方式 | 其他方式
-        let handlerKey = reString[1];
-        const funcKey = reString[2];
-
-        // 需要搜索的内容
-        const reSearchValue = value.slice(reString[0].length);
-        let searchValueArray = reSearchValue.match(/\[(.*)]/);
-        if (!searchValueArray) {
-            searchValueArray = ["search", reSearchValue];
-        }
-
-        // 控制台
-        if (handlerKey === "console" && funcKey ==="ui") {
-            const root = document.getElementById("console");
-            root.style.display = "block";
+        const reString = value.match(/@(.*?)@/);
+        if (!reString) {
             return false;
         }
 
-        // 搜索
-        if (handlerKey.slice(0, 6) === "search") {
-            if (handlerKey !== "searchNum") {
-                handlerKey = "searchStr";
-            }
-            const handlerFunc = searchApi[handlerKey];
-            search_list = handlerFunc(funcKey, searchValueArray[1]);
+        const reSearchValue = value.slice(reString[0].length);
+        let searchValueArray = reSearchValue.match(/\[(.*)]/);
+        if (!searchValueArray) {
+            return false;
+        }
 
+        const valueSplit = reString[1].split(":");
+        let copyApi = inputApi;
+        for (let i = 0; i < valueSplit.length; i++) {
+            if (!copyApi[valueSplit[i]]) {
+                return false;
+            }
+            copyApi = copyApi[valueSplit[i]];
+        }
+
+        if (typeof copyApi !== "function") {
+            return false;
+        }
+        search_list = (copyApi || function(_) {return -1})(searchValueArray[1]);
+        if (search_list === -1) {
+            old_code = "";
+            return true;
+        }
+        if (search_list.length !== 0) {
+            console.log(search_list);
             return searchNext();
         }
 
