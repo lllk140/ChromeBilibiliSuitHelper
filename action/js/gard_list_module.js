@@ -172,7 +172,7 @@ export function GetCardItems() {
 }
 
 export const searchApi = {
-    searchString: function(key, value) {
+    searchStr: function(key, value) {
         // 字符串搜索
         const items = GetCardItems();
         const search_list = [];
@@ -186,7 +186,7 @@ export const searchApi = {
         return search_list
     },
 
-    searchNumber: function(key, value) {
+    searchNum: function(key, value) {
         // 范围搜索
         const timeKeys = ["sale_time", "date"];
         const numberKeys = ["number", "own_num"];
@@ -233,7 +233,7 @@ export const searchApi = {
 }
 
 function createCodeTipsList() {
-    const searchCodeList = [":searchString:", ":searchNumber:"]
+    const searchCodeList = [":searchStr:", ":searchNum:"]
 
     let codeTipsList = [];
     codeTipsList.push.apply(codeTipsList, searchCodeList);
@@ -256,31 +256,14 @@ function createCodeTipsList() {
     return codeTipsList;
 }
 
-export function createCodeTips(value, key, input, resList=[]) {
+export function createCodeTips(value) {
     const codeList = createCodeTipsList();
 
-    if (key === "Tab" && resList.length !== 0) {
-        console.log("res", resList[0]);
-        input.value = resList[0];
-        let timer = setInterval(function() {
-            // 6
-            if (input.value === resList[0]) {
-                clearInterval(timer);
-                input.focus();
-                if (input.value.slice(input.value.length - 2) === "[]") {
-                    const startR = input.selectionStart - 1;
-                    const EndR = input.selectionEnd - 1;
-                    input.setSelectionRange(startR, EndR);
-                }
-            }
-        }, 50);
-        return []
-    }
-
-    resList = [];
-
+    const resList = [];
     for (let i = 0; i < codeList.length; i++) {
-        if (codeList[i].indexOf(value) !== -1) {
+        const code = codeList[i];
+        const text = code.slice(0, value.length);
+        if (value === text) {
             resList.push(codeList[i]);
         }
     }

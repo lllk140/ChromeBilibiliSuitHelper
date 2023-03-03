@@ -194,3 +194,36 @@ body {
     top: 0;
     left: 0;
 }
+
+/* 搜索提示 */
+
+#code-tips {
+    position: absolute;
+    width: 100%;
+    top: 30px;
+    background-color: #202020;
+    list-style: none;
+}
+
+#code-tips a {
+    display: block;
+    float: top;
+    width: 100%;
+    font-size: 18px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#code-tips a:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #404040;
+}
+
+#code-tips[data-style="hide"] {
+    display: none;
+}
+
+.choose-code {
+    background-color: rgba(255, 255, 255, 0.5);
+}
