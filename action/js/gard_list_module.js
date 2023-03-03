@@ -84,11 +84,12 @@ function GetFanCardsList(total, ps) {
 
 function CreateFanCardTag(item) {
     // 创建粉丝卡片标签
-    function CreateFanCardText(text) {
+    function CreateFanCardText(text, className=null) {
         // 创建文本内容
         const span = document.createElement("span");
         span.innerText = text;
-        return span
+        span.className = className;
+        return span;
     }
 
     const card = document.createElement("li");
@@ -100,12 +101,12 @@ function CreateFanCardTag(item) {
     const fanCardImage = document.createElement("img");
     fanCardImage.src = item["fan_share_image"];
 
-    card.append(CreateFanCardText(item["name"]));
-    card.append(CreateFanCardText("FANS NO."));
-    card.append(CreateFanCardText(padNum(item["number"], 6)));
-    card.append(CreateFanCardText("DATE"));
-    card.append(CreateFanCardText(item["date"]));
-    card.append(CreateFanCardText(padNum(item["own_num"], 3)));
+    card.append(CreateFanCardText(item["name"], "fan-card-name"));
+    card.append(CreateFanCardText("FANS NO.", "fan-card-number-title"));
+    card.append(CreateFanCardText(padNum(item["number"], 6), "fan-card-number"));
+    card.append(CreateFanCardText("DATE", "fan-card-date-title"));
+    card.append(CreateFanCardText(item["date"], "fan-card-date"));
+    card.append(CreateFanCardText(padNum(item["own_num"], 3), "fan-card-own_num"));
     card.append(fanCardImage);
 
     // delete item["fan_share_image"];
@@ -189,6 +190,7 @@ export function setInputValue(input, value, auto=true) {
     return timer
 }
 
+// ------------------------------------
 
 function searchString(key, value) {
     const items = GetCardItems();
@@ -252,6 +254,13 @@ function searchRange(key, value, date=true) {
     return search_list
 }
 
+function setFanCardColor(className, color) {
+    const tags = document.getElementsByClassName(className);
+    for (let i = 0; i < tags.length; i++) {
+        tags[i].style.color = color;
+    }
+}
+
 export const inputApi = {
     search: {
         // {"name":"赏樱大会欧皇套装","item_id":4664,"number":6374,"date":"2021/04/22","own_num":2,"sale_time":-1}
@@ -279,5 +288,23 @@ export const inputApi = {
             console.log("open ui");
             return -1;
         },
-    }
+        reload: function(_) {
+            window.location.reload();
+            return -1;
+        },
+        update: async function(_) {
+            await StartLoad();
+            return -1;
+        }
+    },
+
+    card: {
+        color: {
+            name: function(color) {setFanCardColor("fan-card-name", color); return -1},
+            title1: function(color) {setFanCardColor("fan-card-number-title", color); return -1},
+            number: function(color) {setFanCardColor("fan-card-number", color); return -1},
+            title2: function(color) {setFanCardColor("fan-card-date-title", color); return -1},
+            date: function(color) {setFanCardColor("fan-card-date", color); return -1},
+        }
+    },
 }

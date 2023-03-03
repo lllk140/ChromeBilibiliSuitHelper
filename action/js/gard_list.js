@@ -84,9 +84,7 @@ window.onclick = function(event) {
             return null;
         }
 
-        const valueSplit = value.slice(1).split(":");
-
-        console.log("code:", valueSplit);
+        const valueSplit = value.slice(1).split(".");
 
         const code_node = [];
         let header = [];
@@ -120,10 +118,10 @@ window.onclick = function(event) {
         for (let i = 0; i < code_node.length; i++) {
             const code = code_node[i].slice(0, tail.length);
             if (code === tail) {
-                const joinText = header.join(":");
-                const node = !joinText ? "" : joinText + ":";
+                const joinText = header.join(".");
+                const node = !joinText ? "" : joinText + ".";
 
-                let tailText = ":";
+                let tailText = ".";
                 if (typeof copyApi[code_node[i]] === "function") {
                     tailText = "@[]";
                 }
@@ -193,7 +191,7 @@ window.onclick = function(event) {
             return false;
         }
 
-        const valueSplit = reString[1].split(":");
+        const valueSplit = reString[1].split(".");
         let copyApi = inputApi;
         for (let i = 0; i < valueSplit.length; i++) {
             if (!copyApi[valueSplit[i]]) {
