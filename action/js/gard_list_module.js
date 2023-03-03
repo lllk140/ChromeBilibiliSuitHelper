@@ -256,7 +256,7 @@ function createCodeTipsList() {
     return codeTipsList;
 }
 
-export function createCodeTips(value) {
+export function searchCodeTips(value) {
     const codeList = createCodeTipsList();
 
     const resList = [];
@@ -269,4 +269,21 @@ export function createCodeTips(value) {
     }
 
     return resList
+}
+
+export function setInputValue(input, value, auto=true) {
+    input.value = value;
+    let timer = setInterval(function() {
+        if (input.value !== value) {
+            return null;
+        }
+        clearInterval(timer);
+        input.focus();
+        if (input.value.slice(-2) === "[]" && auto) {
+            const s = input.selectionStart - 1;
+            const e = input.selectionEnd - 1;
+            input.setSelectionRange(s, e);
+        }
+    }, 10);
+    return timer
 }

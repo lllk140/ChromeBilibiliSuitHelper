@@ -1,19 +1,7 @@
-import {StartLoad, searchApi, createCodeTips} from "/action/js/gard_list_module.js";
+import {StartLoad, searchApi, searchCodeTips, setInputValue} from "/action/js/gard_list_module.js";
 
 
 window.onload = StartLoad;
-window.onclick = function(event) {
-    const root = document.getElementById("code-tips");
-
-    let target = event.target;
-    if(target.nodeName === "A") {
-        target = target.parentNode;
-    }
-
-    if (target.id !== "code-tips" && target.id !== "search") {
-        root.dataset["style"] = "hide";
-    }
-};
 
 document.getElementById("back").onclick = function() {
     // 返回上一页
@@ -25,6 +13,17 @@ document.getElementById("sort").onclick = function() {
     window.location.href = "sort.html";
 };
 
+window.onclick = function(event) {
+    const root = document.getElementById("code-tips");
+    let target = event.target;
+    if(target.nodeName === "A") {
+        target = target.parentNode;
+    }
+    if (target.id !== "code-tips" && target.id !== "search") {
+        root.dataset["style"] = "hide";
+    }
+};
+
 
 (async function() {
     let old_code = null;
@@ -32,6 +31,7 @@ document.getElementById("sort").onclick = function() {
     let code_list = [];
 
     function onFocus(eid, func=function(_) {}) {
+        // 监听光标信息
         const root = document.getElementById(eid);
         let start, end;
 
@@ -39,8 +39,16 @@ document.getElementById("sort").onclick = function() {
             const selectionStart = root.selectionStart;
             const selectionEnd = root.selectionEnd;
 
-            if (root !== document.activeElement && !root.value) {
-                const tips = document.getElementById("code-tips");
+            const tips = document.getElementById("code-tips");
+
+            if (!root.value) {
+                tips.dataset["style"] = "hide";
+                start = 0;
+                end = 0;
+                return null;
+            }
+
+            if (root !== document.activeElement) {
                 tips.dataset["style"] = "hide";
                 return null;
             }
@@ -52,8 +60,10 @@ document.getElementById("sort").onclick = function() {
             const closeYN = func({
                 root: root, location: {s: selectionStart, e: selectionEnd}
             });
+
             start = selectionStart;
             end = selectionEnd;
+
             if (closeYN === -1) {
                 clearInterval(timer);
             }
@@ -62,14 +72,15 @@ document.getElementById("sort").onclick = function() {
     }
 
     onFocus("search", function(event) {
-        if (event.location.s !== event.location.e) {
-            return null;
-        }
+        const tips = document.getElementById("code-tips");
 
-        const selection = event.location.s;
-        const value = event.root.value.slice(0, selection);
+        const _ls = event.location.s;
+        const _le = event.location.e;
+        const _value = event.root.value;
 
-        code_list = createCodeTips(value);
+        const value = _ls === _le ? _value.slice(0, _le) : _value.slice(_ls, _le);
+
+        let code_list = searchCodeTips(value);
         if (code_list.length !== 0) {
             if (code_list[0] === event.root.value) {
                 code_list = code_list.slice(1);
@@ -77,37 +88,20 @@ document.getElementById("sort").onclick = function() {
         }
         const page_code_list = code_list.slice(0, 5);
 
-        const root = document.getElementById("code-tips");
-        root.innerHTML = "";
+        tips.innerHTML = "";
         for (let i = 0; i < page_code_list.length; i++) {
             const textTag = document.createElement("a");
             textTag.innerText = page_code_list[i];
             textTag.onclick = function() {
                 const input = document.getElementById("search");
-                input.value = textTag.innerText;
-                let timer = setInterval(function() {
-                    if (input.value !== textTag.innerText) {
-                        return null;
-                    }
-                    clearInterval(timer);
-                    input.focus();
-                    if (input.value.slice(input.value.length - 2) === "[]") {
-                        const s = input.selectionStart - 1;
-                        const e = input.selectionEnd - 1;
-                        input.setSelectionRange(s, e);
-                    }
-                }, 10);
+                setInputValue(input, this.innerText, true);
             }
-            root.appendChild(textTag);
+            tips.appendChild(textTag);
         }
-        if (event.root.value) {
-            root.dataset["style"] = "show";
-        } else {
-            root.dataset["style"] = "hide";
-        }
+        tips.dataset["style"] = "show";
 
-        if (root.childNodes.length !== 0) {
-            root.childNodes[0]["classList"].add("choose-code");
+        if (tips.childNodes.length !== 0) {
+            tips.childNodes[0]["classList"].add("choose-code");
         }
     });
 
@@ -176,13 +170,6 @@ document.getElementById("sort").onclick = function() {
         return true;
     };
 
-    document.getElementById("search").onfocus = function() {
-        const root = document.getElementById("code-tips");
-        if (root.dataset["style"] === "hide" && this.value) {
-            root.dataset["style"] = "show";
-        }
-    }
-
     window.onkeydown = function(event) {
         const root = document.getElementById("code-tips");
         if (root.dataset["style"] === "hide") {
@@ -194,20 +181,8 @@ document.getElementById("sort").onclick = function() {
 
         if (event.key === "Tab") {
             const resValue = codeTags.length !== 0 ? codeTags[0].innerText : input.value;
-            input.value = resValue;
-            let timer = setInterval(function() {
-                const _value = input.value;
-                if (_value !== resValue) {
-                    return null;
-                }
-                clearInterval(timer);
-                input.focus();
-                if (_value.slice(_value.length - 2) === "[]") {
-                    const s = input.selectionStart - 1;
-                    const e = input.selectionEnd - 1;
-                    input.setSelectionRange(s, e);
-                }
-            }, 10);
+            setInputValue(input, resValue, true);
+            return null;
         }
 
         if (event.key === "ArrowUp" && codeTags.length !== 0) {
@@ -216,6 +191,7 @@ document.getElementById("sort").onclick = function() {
                 codeTags[0].className = "";
                 upTag.className = "choose-code";
             }
+            return null;
         }
 
         if (event.key === "ArrowDown" && codeTags.length !== 0) {
@@ -224,6 +200,7 @@ document.getElementById("sort").onclick = function() {
                 codeTags[0].className = "";
                 downTag.className = "choose-code";
             }
+            return null;
         }
     };
 })();
