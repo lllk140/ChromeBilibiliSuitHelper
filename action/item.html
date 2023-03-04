@@ -3,12 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/assets/lib/style/defaultMessage.css">
+    <link rel="stylesheet" href="css/item.css">
     <title>item.html</title>
 </head>
 <body>
-    <div>
-        <img src="" alt="">
+    <img id="background">
+    <div class="title">
+        <button id="back">
+            <img src="/assets/icons/back.png" alt="关闭">
+        </button>
+        <a id="gard-title" title="loading...">loading...</a>
+        <button id="setting">
+            <img src="/assets/icons/setting.png" alt="设置">
+        </button>
+        <div id="fan-card"></div>
+        <a id="count">loading...</a>
+        <div class="title-button">
+            <input type="button" value="交易记录" id="number-log">
+            <input type="button" value="赠送编号" id="give-number">
+        </div>
     </div>
-    <a href="garb_list.html">garb_list.html</a>
+    <div class="content">
+        <div class="assets-content-box">
+            <div class="assets-content" id="assets">
+                <!-- 顺序太搞人了, 将就着用吧 -->
+            </div>
+            <a id="buy-again">再次支持</a>
+        </div>
+        <div class="content-button">
+            <button id="download" title="下载装扮内容">
+                <img src="/assets/icons/download.png" alt="下载">
+            </button>
+            <input type="button" value="一键装扮" id="load-all">
+        </div>
+    </div>
+    <script type="module" src="js/item.js"></script>
+    <script type="module" src="js/test.js"></script>
 </body>
 </html>

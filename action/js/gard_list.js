@@ -152,7 +152,9 @@ window.onclick = function(event) {
         if (search_list.length === 0) {
             return false;
         }
-        window.location.hash = `#${search_list[0]["item_id"]}`;
+        // window.location.hash = `#${search_list[0]["item_id"]}`;
+        const item_id = search_list[0]["item_id"].toString();
+        document.getElementById(item_id).scrollIntoView(true);
         search_list = search_list.slice(1);
         document.getElementById("search").focus();
         return true;
@@ -180,15 +182,16 @@ window.onclick = function(event) {
 
         console.log("onkeydown:", value);
 
-        const reString = value.match(/@(.*?)\(/);
+        let reString = value.match(/@(.*?)\(/);
         if (!reString) {
-            return false;
+            reString = ["", "search.string.name"];
         }
 
         const reSearchValue = value.slice(reString[0].length-1);
         let searchValueArray = reSearchValue.match(/\((.*)\)/);
+
         if (!searchValueArray) {
-            return false;
+            searchValueArray = ["", value];
         }
 
         const valueSplit = reString[1].split(".");
@@ -210,7 +213,6 @@ window.onclick = function(event) {
             return true;
         }
         if (search_list.length !== 0) {
-            console.log(search_list);
             return searchNext();
         }
 

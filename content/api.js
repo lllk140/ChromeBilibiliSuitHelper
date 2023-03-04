@@ -56,6 +56,14 @@ const biliApi = {
         return JSON.parse(res);
     },
 
+    GetSuitBuyNum: async function(message) {
+      // 获取装扮购买套数
+      const url = "https://api.bilibili.com/x/garb/user/multbuy";
+        const params = {"item_id": message.item_id || ""};
+        const res = await XMLHttp({method: "GET", url: url, params: params});
+        return JSON.parse(res);
+    },
+
     GetOthersInfo: async function(message) {
         // 获取其他人基础信息
         const url = "https://account.bilibili.com/api/member/getCardByMid";

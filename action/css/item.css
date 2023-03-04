@@ -1,0 +1,344 @@
+@font-face {
+    font-family: "fansCard";
+    src:url("/assets/fonts/fansCard.ttf");
+}
+
+
+body {
+    margin: 5px;
+    width: 350px;
+    height: 590px;
+    background: #202020;
+}
+
+#background {
+    z-index: -1;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    background-size: cover;
+    object-fit: cover;
+    user-select: none;
+    opacity: 0.6;
+    background-color: #202020;
+}
+
+.title {
+    backdrop-filter: blur(5px);
+    position: relative;
+    width: 100%;
+    height: 210px;
+}
+
+#back, #setting {
+    position: relative;
+    background: transparent;
+    float: left;
+    border-style: none;
+    outline: none;
+    user-select: none;
+    font-size: 14px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+#back img, #setting img {
+    user-select: none;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 0;
+    left: 0;
+}
+
+#gard-title {
+    color: white;
+    float: left;
+    border-style: none;
+    display: block;
+    height: 25px;
+    text-align: center;
+    width: calc(100% - 70px);
+    font-weight: bold;
+    line-height: 25px;
+    font-size: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+/* -------------------------- */
+
+#count {
+    top: 20px;
+    line-height: 25px;
+    position: relative;
+    float: left;
+    white-space: nowrap;
+    display: block;
+    width: 150px;
+    margin-left: 15px;
+    height: 25px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    user-select: none;
+}
+
+.title-button {
+    top: 20px;
+    position: relative;
+    float: right;
+    right: 15px;
+}
+
+.title-button input {
+    float: left;
+    outline: none;
+    margin-left: 10px;
+    border: 2px solid white;
+    border-radius: 5px;
+    background: transparent;
+    color: white;
+    height: 25px;
+    width: 70px;
+    cursor: pointer;
+}
+
+/* -------------------------- */
+
+.content {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background-color: #202020;
+}
+
+#buy-again {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    position: relative;
+    bottom: 0;
+    float: right;
+    right: 15px;
+    color: #FB7299;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    height: 15px;
+    line-height: 15px;
+}
+
+
+.content-button {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    border-top: 1px solid white;
+}
+
+/* -------------------------- */
+
+.assets-content-box {
+    width: 100%;
+    height: 330px;
+    overflow: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: transparent;
+}
+
+.assets-content-box::-webkit-scrollbar {
+    width: 0;
+}
+
+.assets-content-box::-webkit-scrollbar-thumb {
+    width: 0;
+}
+
+.assets-content {
+    min-height: 295px;
+    width: 350px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.assets-item {
+    position: relative;
+    margin-top: 15px;
+    width: 100px;
+    margin-left: 10px;
+    text-align: center;
+    left: 6px;
+}
+
+.assets-item .assets-item-image {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.assets-item .assets-item-name {
+    position: relative;
+    width: 100px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.assets-item .assets-item-button {
+    position: relative;
+    outline: none;
+    border: 2px solid #FB7299;
+    cursor: pointer;
+    width: 100px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background: #FB7299;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+}
+
+.assets-item .assets-item-button[disabled] {
+    position: relative;
+    outline: none;
+    border: 2px solid #404040;
+    width: 100px;
+    margin-top: 5px;
+    background: #404040;
+    border-radius: 5px;
+    cursor: default;
+    color: #606060;
+}
+
+/* --------------------------------------- */
+
+#download {
+    background: transparent;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    outline: none;
+    user-select: none;
+    border-style: none;
+    left: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+#download img {
+    position: absolute;
+    left: 0; top: 0;
+    width: 30px;
+    height: 30px;
+    user-select: none;
+}
+
+#load-all {
+    position: relative;
+    user-select: none;
+    float: right;
+    height: 30px;
+    border-style: none;
+    outline: none;
+    width: 100px;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: black;
+    background: #FB7299;
+    font-weight: bold;
+}
+
+/* -------------------------- */
+
+#fan-card {
+    float: left;
+    position: relative;
+    background-color: #202020;
+    border-radius: 10px;
+    width: 320px;
+    height: 132px;
+    left: 15px;
+    top: 10px;
+}
+
+#fan-card img {
+    width: 320px;
+    height: 132px;
+    background-size: cover;
+    object-fit: cover;
+    user-select: none;
+    border-radius: 10px;
+}
+
+#fan-card span {
+    position: absolute;
+    user-select: none;
+    display: block;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0);
+}
+
+#fan-card span:nth-child(1) {
+    left: 10px;
+    top: 10px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#fan-card span:nth-child(2) {
+    left: 10px;
+    top: 40px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+    background: transparent;
+}
+
+#fan-card span:nth-child(3) {
+    left: 10px;
+    top: 60px;
+    color: white;
+    font-size: 16px;
+    font-family: "fansCard", serif;
+}
+
+#fan-card span:nth-child(4) {
+    left: 10px;
+    top: 80px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    background: transparent;
+    font-weight: bold;
+}
+
+#fan-card span:nth-child(5) {
+    left: 10px;
+    top: 95px;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+}

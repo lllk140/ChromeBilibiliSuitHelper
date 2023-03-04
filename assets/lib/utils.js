@@ -35,20 +35,22 @@ export function padNum(num, len, s="0") {
 }
 
 
-// function getQueryString(key) {
-//     const param_text = window.location.search;
-//     if (!param_text) {
-//         return null;
-//     }
-//     const param = param_text.substring(1);
-//     let items = param.split("&");
-//     const content = {};
-//     for (let i = 0; i < items.length; i++) {
-//         const key = items[i].split("=")[0];
-//         content[key] = items[i].split("=")[1];
-//     }
-//     return content[key] || null;
-// }
+export function getUrlQuery(key, err=null) {
+    // 获取url参数;
+    const param_text = window.location.search;
+    if (!param_text) {
+        return null;
+    }
+    const param = param_text.substring(1);
+    let items = param.split("&");
+    const content = {};
+    for (let i = 0; i < items.length; i++) {
+        const key = items[i].split("=")[0];
+        content[key] = items[i].split("=")[1];
+    }
+    return content[key] || err;
+}
+
 //
 //
 // function ParseUrlQueryData(key="data") {
