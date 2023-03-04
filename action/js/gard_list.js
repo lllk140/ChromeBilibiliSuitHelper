@@ -123,7 +123,7 @@ window.onclick = function(event) {
 
                 let tailText = ".";
                 if (typeof copyApi[code_node[i]] === "function") {
-                    tailText = "@[]";
+                    tailText = "()";
                 }
                 code_list.push(`@${node}${code_node[i]}${tailText}`);
             }
@@ -180,13 +180,13 @@ window.onclick = function(event) {
 
         console.log("onkeydown:", value);
 
-        const reString = value.match(/@(.*?)@/);
+        const reString = value.match(/@(.*?)\(/);
         if (!reString) {
             return false;
         }
 
-        const reSearchValue = value.slice(reString[0].length);
-        let searchValueArray = reSearchValue.match(/\[(.*)]/);
+        const reSearchValue = value.slice(reString[0].length-1);
+        let searchValueArray = reSearchValue.match(/\((.*)\)/);
         if (!searchValueArray) {
             return false;
         }
@@ -203,6 +203,7 @@ window.onclick = function(event) {
         if (typeof copyApi !== "function") {
             return false;
         }
+
         search_list = (copyApi || function(_) {return -1})(searchValueArray[1]);
         if (search_list === -1) {
             old_code = "";

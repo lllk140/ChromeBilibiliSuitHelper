@@ -181,7 +181,7 @@ export function setInputValue(input, value, auto=true) {
         }
         clearInterval(timer);
         input.focus();
-        if (input.value.slice(-2) === "[]" && auto) {
+        if (input.value.slice(-2) === "()" && auto) {
             const s = input.selectionStart - 1;
             const e = input.selectionEnd - 1;
             input.setSelectionRange(s, e);
@@ -284,15 +284,15 @@ export const inputApi = {
         }
     },
     console: {
-        ui: function(_) {
+        "ui": function(_) {
             console.log("open ui");
             return -1;
         },
-        reload: function(_) {
+        "reload": function(_) {
             window.location.reload();
             return -1;
         },
-        update: async function(_) {
+        "update": async function(_) {
             await StartLoad();
             return -1;
         }
@@ -300,11 +300,20 @@ export const inputApi = {
 
     card: {
         color: {
-            name: function(color) {setFanCardColor("fan-card-name", color); return -1},
-            title1: function(color) {setFanCardColor("fan-card-number-title", color); return -1},
-            number: function(color) {setFanCardColor("fan-card-number", color); return -1},
-            title2: function(color) {setFanCardColor("fan-card-date-title", color); return -1},
-            date: function(color) {setFanCardColor("fan-card-date", color); return -1},
+            "all": function(color) {
+                // 暴力
+                setFanCardColor("fan-card-name", color);
+                setFanCardColor("fan-card-number-title", color);
+                setFanCardColor("fan-card-number", color);
+                setFanCardColor("fan-card-date-title", color);
+                setFanCardColor("fan-card-date", color);
+                return -1;
+            },
+            "name": function(color) {setFanCardColor("fan-card-name", color); return -1},
+            "title1": function(color) {setFanCardColor("fan-card-number-title", color); return -1},
+            "number": function(color) {setFanCardColor("fan-card-number", color); return -1},
+            "title2": function(color) {setFanCardColor("fan-card-date-title", color); return -1},
+            "date": function(color) {setFanCardColor("fan-card-date", color); return -1},
         }
     },
 }
