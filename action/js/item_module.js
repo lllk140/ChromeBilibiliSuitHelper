@@ -3,7 +3,7 @@ import {padNum} from "/assets/lib/utils.js";
 
 export function loadPageContent(data, own_num) {
     // 加载页面内容 [不带组件]
-    function createFanCard(fan_share_image, fan_item) {
+    function createFanCard(fan_share_image, fan_item, gard_name) {
         // 创建粉丝卡片内容;
         const box = document.createElement("div");
         function CreateFanCardText(text, className=null) {
@@ -15,8 +15,8 @@ export function loadPageContent(data, own_num) {
         }
         const fanCardImage = document.createElement("img");
         fanCardImage.src = fan_share_image;
-        fanCardImage.alt = fan_item["name"];
-        box.append(CreateFanCardText(fan_item["name"], "fan-card-name"));
+        fanCardImage.alt = gard_name;
+        box.append(CreateFanCardText(gard_name, "fan-card-name"));
         box.append(CreateFanCardText("FANS NO.", "fan-card-number-title"));
         box.append(CreateFanCardText(padNum(fan_item["number"], 6), "fan-card-number"));
         box.append(CreateFanCardText("DATE", "fan-card-date-title"));
@@ -27,10 +27,11 @@ export function loadPageContent(data, own_num) {
 
     document.getElementById("background").src = data["item"]["properties"]["image_cover"];
     const gard_title = document.getElementById("gard-title");
+    const gardName = data["item"]["name"];
     gard_title.title = data["item"]["properties"]["desc"];
-    gard_title.innerText = data["item"]["name"];
-    const fan_image = data["item"]["properties"]["fan_share_image"];
-    document.getElementById("fan-card").innerHTML = createFanCard(fan_image, data["fan"]);
+    gard_title.innerText = gardName;
+    const image = data["item"]["properties"]["fan_share_image"];
+    document.getElementById("fan-card").innerHTML = createFanCard(image, data["fan"], gardName);
     document.getElementById("count").innerText = `总共${own_num}套粉丝装扮`;
 
     return true;
@@ -138,7 +139,14 @@ const AttachAssetsSort = [
     }
 ]
 
-const attachKeys = ["item_id_card", "item_id_emoji", "item_id_pendant", "item_id_thumbup"]
+const attachKeys = [
+    // 尼玛, b站要不要自己看看自己写的啥东西老装扮是item_id_emoji 新的item_id_emoji_package
+    "item_id_card",
+    "item_id_emoji",
+    "item_id_emoji_package",
+    "item_id_pendant",
+    "item_id_thumbup",
+]
 
 // --------------------
 

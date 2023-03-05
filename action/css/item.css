@@ -231,27 +231,6 @@ body {
 
 /* --------------------------------------- */
 
-#download {
-    background: transparent;
-    position: relative;
-    width: 30px;
-    height: 30px;
-    outline: none;
-    user-select: none;
-    border-style: none;
-    left: 10px;
-    top: 10px;
-    cursor: pointer;
-}
-
-#download img {
-    position: absolute;
-    left: 0; top: 0;
-    width: 30px;
-    height: 30px;
-    user-select: none;
-}
-
 #load-all {
     position: relative;
     user-select: none;
