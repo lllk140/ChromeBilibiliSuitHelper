@@ -217,7 +217,7 @@ body {
     font-weight: bold;
 }
 
-.assets-item .assets-item-button[disabled] {
+.assets-item .assets-item-button[data-load="1"] {
     position: relative;
     outline: none;
     border: 2px solid #404040;
