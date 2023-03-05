@@ -9,6 +9,19 @@ document.getElementById("back").onclick = function() {
     history.go(-1);
 };
 
+document.getElementById("load-all").onclick = async function() {
+    const item_id =  getUrlQuery("item_id", null);
+    const res = await contentPage("LoadGardPart", {
+        "part": "suit", "item_id": item_id,
+    });
+    if (res["code"] === 0) {
+        await MessageInfo({message: "操作成功"});
+        location.reload();
+    } else {
+        await MessageInfo({message: res["message"]});
+    }
+};
+
 
 window.onload = async function() {
     const item_id =  getUrlQuery("item_id", null);
@@ -54,8 +67,34 @@ window.onload = async function() {
 
     const root = document.getElementById("assets");
     root.innerHTML = "";
+
+    async function handler() {
+        if (this.dataset["type"] === "2") {
+            window.location.href = this.dataset["part"] + ".html";
+            return null;
+        }
+
+        let res = {};
+        if (this.dataset["type"] === "0") {
+            res = await contentPage("LoadGardPart", {
+                "part": this.dataset["part"],
+                "item_id": this.dataset["item_id"]
+            });
+        }
+        if (this.dataset["type"] === "1") {
+            res = await contentPage("UnloadGardPart", {
+                "part": this.dataset["part"]
+            });
+        }
+        if (res["code"] === 0) {
+            await MessageInfo({message: "操作成功"});
+            location.reload();
+        } else {
+            await MessageInfo({message: res["message"]});
+        }
+    }
     for (let i = 0; i < assets_items.length; i++) {
-        const tag = createAssetTag(assets_items[i]);
+        const tag = createAssetTag(assets_items[i], handler);
         root.append(tag);
     }
 }

@@ -3,7 +3,6 @@
     src:url("/assets/fonts/fansCard.ttf");
 }
 
-
 body {
     margin: 5px;
     width: 350px;
@@ -176,6 +175,7 @@ body {
 }
 
 .assets-item {
+    user-select: none;
     position: relative;
     margin-top: 15px;
     width: 100px;
@@ -217,7 +217,7 @@ body {
     font-weight: bold;
 }
 
-.assets-item .assets-item-button[data-load="1"] {
+.assets-item .assets-item-button[data-type="1"] {
     position: relative;
     outline: none;
     border: 2px solid #404040;
@@ -225,7 +225,7 @@ body {
     margin-top: 5px;
     background: #404040;
     border-radius: 5px;
-    cursor: default;
+    cursor: pointer;
     color: #606060;
 }
 

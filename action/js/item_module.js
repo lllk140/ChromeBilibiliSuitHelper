@@ -36,7 +36,7 @@ export function loadPageContent(data, own_num) {
     return true;
 }
 
-export function createAssetTag(item) {
+export function createAssetTag(item, handler) {
     // 创建组件的标签
     const box = document.createElement("div");
     box.className = "assets-item";
@@ -54,16 +54,19 @@ export function createAssetTag(item) {
     button.dataset["item_id"] = item["item_id"];
     button.className = "assets-item-button";
     button.innerText = "装扮";
+    button.dataset["type"] = "0";
 
     if (item["equiped"] === true) {
-        button.dataset["load"] = "1";
+        button.dataset["type"] = "1";
         button.innerText = "已装扮";
     }
 
     if (["emoji_package", "space_bg"].indexOf(item["part"]) !== -1) {
-        button.dataset["load"] = "0";
+        button.dataset["type"] = "2";
         button.innerText = "设置";
     }
+
+    button.onclick = handler
 
     box.appendChild(image);
     box.appendChild(text);

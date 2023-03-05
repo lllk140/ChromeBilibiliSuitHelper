@@ -292,8 +292,8 @@ export const inputApi = {
             window.location.reload();
             return -1;
         },
-        "update": async function(_) {
-            await StartLoad();
+        "update": function(_) {
+            StartLoad().then()
             return -1;
         }
     },

@@ -90,6 +90,28 @@ const biliApi = {
 
     // -------------------------------------------------------------------------------
 
+    LoadGardPart: async function(message) {
+        // 设置装扮对应组件
+        const cookies = await biliApi.GetCookies({type: "json"});
+        const url = "https://api.bilibili.com/x/garb/user/equip/load";
+        const formData = {
+            "part": message["part"],
+            "item_id": message["item_id"],
+            "csrf": cookies["bili_jct"],
+        };
+        const res = await XMLHttp({method: "POST", url: url}, {data: formData});
+        return JSON.parse(res);
+    },
+
+    UnloadGardPart: async function(message) {
+        // 卸下装扮对应组件
+        const cookies = await biliApi.GetCookies({type: "json"});
+        const url = "https://api.bilibili.com/x/garb/user/equip/unload";
+        const formData = {"part": message["part"], "csrf": cookies["bili_jct"]};
+        const res = await XMLHttp({method: "POST", url: url}, {data: formData});
+        return JSON.parse(res);
+    },
+
     CancelGiveFanNumber: async function(message) {
         // 取消赠送
         const cookies = await biliApi.GetCookies({type: "json"});

@@ -210,7 +210,7 @@ window.onclick = function(event) {
         search_list = (copyApi || function(_) {return -1})(searchValueArray[1]);
         if (search_list === -1) {
             old_code = "";
-            return true;
+            return false;
         }
         if (search_list.length !== 0) {
             return searchNext();
