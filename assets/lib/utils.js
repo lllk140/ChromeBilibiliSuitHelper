@@ -31,7 +31,7 @@ export function sleepTime(time) {
 
 export function padNum(num, len, s="0") {
     // 数字补齐
-    return (Array(len).join(s) + num.toString()).slice(-len);
+    return (Array(len).join(s) + (num || 0).toString()).slice(-len);
 }
 
 

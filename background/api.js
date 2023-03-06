@@ -76,6 +76,26 @@ export const backgroundPageApi = {
         return (scammer["list"] || []).indexOf(mid) === -1
     },
 
+    SetFanCardConfig: async function(message) {
+        // 设置FanCardConfig;
+        const config = getStorage("config", {});
+        const fanCardConfig = config["fan-card-config"] || {};
+        fanCardConfig[message["key"]] = message["value"];
+        await saveStorage({"config": fanCardConfig});
+    },
+
+    GetFanCardConfig: async function(message) {
+        // 获取FanCardConfig
+        // RequestSpeed: 每次请求的个数 | default:20;
+        // UserId: 粉丝卡片拥有者用户id;
+        // Total: 粉丝卡片总数;
+        const config = getStorage("config", {});
+        const fanCardConfig = config["fan-card-config"] || {};
+        return fanCardConfig[message["key"]] || (message["err"] || null);
+    },
+
+    // FanCardRequestSpeed: 每次请求的个数 | default:20;
+    // FanCardUserId: 装扮
     GetConfig: async function(message) {
         // 获取配置
         const config = getStorage("config", {});

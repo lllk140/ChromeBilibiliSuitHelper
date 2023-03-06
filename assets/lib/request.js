@@ -77,4 +77,4 @@ function HttpError(func, title, error) {
     });
 }
 
-const XMLHttp = HttpError(XMLHttpSource, "XMLHttp", undefined);
+const XMLHttp = HttpError(XMLHttpSource, "XMLHttp", null);

@@ -1,6 +1,7 @@
 import {padNum} from "/assets/lib/utils.js";
 import {contentPage, backgroundPage} from "/assets/lib/chrome.js";
 import {MessageInfo, MessageTips} from "/assets/lib/message.js";
+import {CreateFanCardTag} from "/action/js/module/fan-card.js";
 
 function createLoadingWindow() {
     // 创建正在加载页面
@@ -23,16 +24,6 @@ function createLoadingWindow() {
     return box
 }
 
-async function GetTotal() {
-    // 获取 装扮总数量
-    let res = await contentPage("GetMyFanCards", {ps: 1, pn: 1});
-    if (res["code"] !== 0) {
-        return {code: res["code"], message: res["message"], total: 0};
-    } else {
-        const total = res["data"]["page"]["total"] || 0;
-        return {code: 0, message: "", total: total};
-    }
-}
 
 function GetFanCardsList(total, ps) {
     // 获取全部装扮列表
@@ -47,17 +38,17 @@ function GetFanCardsList(total, ps) {
             "own_num": item["own_num"],
             "sale_time": parseInt(properties["sale_time_begin"]) || 0,
             "fan_share_image": properties["fan_share_image"],
-            // "desc": properties["desc"]
         };
     }
 
     return new Promise(async function(resolve, _) {
+        if (total === 0) {
+            resolve([]);
+        }
         const pns = Math.ceil(parseInt(total) / (parseInt(ps) || 20));
         const http_list = [];
         for (let i = 0; i < pns; i++) {
-            http_list[i] = contentPage("GetMyFanCards", {
-                pn: i + 1, ps: ps
-            });
+            http_list[i] = contentPage("GetMyFanCards", {pn: i + 1, ps: ps});
         }
         Promise.all(http_list).then(function(response_array) {
             const all_items = [];
@@ -82,73 +73,38 @@ function GetFanCardsList(total, ps) {
     });
 }
 
-function CreateFanCardTag(item) {
-    // 创建粉丝卡片标签
-    function CreateFanCardText(text, className=null) {
-        // 创建文本内容
-        const span = document.createElement("span");
-        span.innerText = text;
-        span.className = className;
-        return span;
-    }
-
-    const card = document.createElement("li");
-
-    card.classList.add("fan-card");
-    card.id = item["item_id"];
-    card.title = item["name"];
-
-    const fanCardImage = document.createElement("img");
-    fanCardImage.src = item["fan_share_image"];
-
-    card.append(CreateFanCardText(item["name"], "fan-card-name"));
-    card.append(CreateFanCardText("FANS NO.", "fan-card-number-title"));
-    card.append(CreateFanCardText(padNum(item["number"], 6), "fan-card-number"));
-    card.append(CreateFanCardText("DATE", "fan-card-date-title"));
-    card.append(CreateFanCardText(item["date"], "fan-card-date"));
-    card.append(CreateFanCardText(padNum(item["own_num"], 3), "fan-card-own_num"));
-    card.append(fanCardImage);
-
-    // delete item["fan_share_image"];
-    // card.dataset["item"] = JSON.stringify(item);
-
-    const data = {
-        "name": item["name"],
-        "item_id": item["item_id"],
-        "number": item["number"],
-        "date": item["date"],
-        "own_num": item["own_num"],
-        "sale_time": item["sale_time"]
-    }
-
-    card.dataset["item"] = JSON.stringify(data);
-
-    return card
-}
 
 export async function StartLoad() {
     const box = createLoadingWindow();
 
-    const totalObj = await GetTotal();
-    if (totalObj.code !== 0) {
-        await MessageTips({message: totalObj.message});
-        await MessageInfo({message: "即将返回首页"});
-        window.location.href = "popup.html";
-        return null;
-    }
+    const total = await (async function() {
+        const res = await contentPage("GetMyFanCards", {ps: 1, pn: 1});
+        if (res["code"] !== 0) {
+            await MessageTips({message: res["message"]});
+            await MessageInfo({message: "即将返回首页"});
+            window.location.href = "popup.html";
+            return null;
+        } else {
+            return parseInt(res["data"]["page"]["total"]) || 0;
+        }
+    })();
 
-    if ((totalObj.total || 0) === 0) {
-        box.innerText = "居然没装扮";
-        return null;
-    }
-
-    const ps = await backgroundPage("GetConfig", {key: "RequestSpeed"});
-
-    const fanCards = await GetFanCardsList(totalObj.total || 0, ps || 20);
+    const ps = await backgroundPage("GetConfig", {key: "FanCardRequestSpeed"});
+    const fanCards = await GetFanCardsList(total || 0, ps || 20);
 
     const root = document.getElementById("garb_list");
     for (let i = 0; i < fanCards.length; i++) {
-        const tag = CreateFanCardTag(fanCards[i]);
+        const values = [fanCards[i], "li", {}, {"own_num": true}];
+        const tag = CreateFanCardTag(...values);
+        tag.id = fanCards[i]["item_id"].toString();
+        tag.dataset["item"] = JSON.stringify({
+            "name": fanCards[i]["name"],
+            "item_id": fanCards[i]["item_id"],
+            "number": fanCards[i]["number"],
+            "date": fanCards[i]["date"],
+            "own_num": fanCards[i]["own_num"],
+            "sale_time": fanCards[i]["sale_time"]
+        });
         tag.ondblclick = function() {
             const item_id = JSON.parse(this.dataset["item"])["item_id"];
             window.location.href = `item.html?item_id=${item_id}`;

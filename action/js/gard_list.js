@@ -1,8 +1,143 @@
-import {StartLoad, setInputValue, inputApi} from "/action/js/gard_list_module.js";
+import {CreateFanCardTag, GetFanCardItems, GetFanCardsList} from "/action/js/module/fan-card.js";
+import {backgroundPage, getStorage, contentPage, saveStorage} from "/assets/lib/chrome.js";
+import {setInputValue, inputApi} from "/action/js/gard_list_module.js";
+import {MessageInfo, MessageJudge} from "/assets/lib/message.js";
 
 
-window.onload = StartLoad;
+async function getNowFanCardTotal() {
+    // 获取粉丝卡片总数
+    const res = await contentPage("GetMyFanCards", {ps: 1, pn: 1});
+    if (res["code"] !== 0) {
+        return {code: -1, data: null, "message": res["message"]};
+    } else {
+        const total = parseInt(res["data"]["page"]["total"]) || 0
+        return {code: 0, data: total, "message": res["message"]};
+    }
+}
 
+
+export async function verifyLocalFanCardContent(nowTotal) {
+    // 验证本地是否可覆盖
+    const localTotal = await backgroundPage("GetFanCardConfig", {key: "Total"});
+    const localUserId = await backgroundPage("GetFanCardConfig", {key: "UserId"});
+
+    const cookie = await contentPage("GetCookies", {type: "json"});
+    const localFanCard = getStorage("fan-card-list", []);
+    const nowUserId = (cookie || {})["DedeUserID"];
+
+    const exp1 = (nowUserId.toString() === localUserId.toString());
+    const exp2 = (localTotal.toString() === nowTotal.toString());
+    const exp3 = (localFanCard.length === parseInt(nowTotal));
+    const exp4 = (localFanCard.length === parseInt(localTotal));
+    if (exp1 && exp2 && exp3 && exp4) {
+        return {code: 0, data: localFanCard, message: "可以从本地更新到页面"};
+    }
+    if (!exp4) {
+        return {code: 3, data: [], message: "本地内容错误"};
+    }
+    return {code: -1, data: [], message: "需从网络更新"};
+}
+
+function setFanCardToPage(elementId, items) {
+    // 设置粉丝卡片到页面
+    const root = document.getElementById(elementId);
+    root.innerHTML = "";
+
+    for (let i = 0; i < items.length; i++) {
+        const values = [items[i], "li", {}, {"own_num": true}];
+        const tag = CreateFanCardTag(...values);
+        tag.id = items[i]["item_id"].toString();
+        tag.dataset["item"] = JSON.stringify({
+            "name": items[i]["name"],
+            "item_id": items[i]["item_id"],
+            "number": items[i]["number"],
+            "date": items[i]["date"],
+            "own_num": items[i]["own_num"],
+            "sale_time": items[i]["sale_time"]
+        });
+        tag.ondblclick = function() {
+            const item_id = JSON.parse(this.dataset["item"])["item_id"];
+            window.location.href = `item.html?item_id=${item_id}`;
+        }
+        root.append(tag);
+    }
+
+    return root
+}
+
+async function PageLoad(enableLocal=false) {
+    // 加载页面
+    const TotalRes = await getNowFanCardTotal() || {};
+    if (TotalRes["code"] === -1) {
+        const err = TotalRes["message"] || "error";
+        await MessageInfo({message: `[${err}]获取总数失败, 将自动返回主页`});
+        window.location.href = "popup.html";
+        return null;
+    }
+    const total = parseInt(TotalRes["data"] || 0);
+
+    let localErr = false;
+
+    if (enableLocal === true) {
+        const LocalVerifyRes = await verifyLocalFanCardContent(total);
+        if (LocalVerifyRes["code"] !== 0) {
+            await MessageInfo({message: LocalVerifyRes["message"]});
+            localErr = true;
+        } else {
+            setFanCardToPage("garb_list", LocalVerifyRes["data"]);
+            return {ver: localErr, data: total};
+        }
+    }
+
+    const ps = await backgroundPage("GetFanCardConfig", {key: "RequestSpeed"});
+    const res = await GetFanCardsList(total, ps || 20, function(item) {
+        const properties = item["item"]["properties"];
+        return {
+            "name": item["item"]["name"],
+            "item_id": item["item"]["item_id"],
+            "number": item["fan"]["number"],
+            "date": item["fan"]["date"],
+            "own_num": item["own_num"],
+            "sale_time": parseInt(properties["sale_time_begin"]) || 0,
+            "fan_share_image": properties["fan_share_image"],
+        };
+    });
+
+    setFanCardToPage("garb_list", res["data"]);
+    if ((res["err"] || []).length !== 0) {
+        let errText = `共${res["err"].length}次错误ps:[${ps}],total:[${total}]\n`;
+        errText += "注:不会影响浏览,但会缺少装扮\n";
+        for (let i = 0; i < res["err"].length; i++) {
+            const errRes = res["err"][i];
+            const count = (errRes["count"] || 0) + 1;
+            errText += `错误: 第${count}次请求, [${errRes["message"]}]\n`;
+        }
+        if (await MessageJudge({message: errText + "是否返回首页?"})) {
+            window.location.href = "popup.html";
+            return null;
+        }
+    }
+
+    const exp = (enableLocal && localErr && (res["err"] || []).length === 0);
+    return {ver: exp, data: total};
+}
+
+window.onload = async function() {
+    // 加载页面
+    const localEnable = await backgroundPage("GetFanCardConfig", {key: "EnableLocal"});
+    const confirmSaveLocal = await PageLoad(localEnable);
+    if (confirmSaveLocal["ver"] === true) {
+        await MessageInfo({message: "粉丝卡片内容已保存到本地"});
+        const items = GetFanCardItems("garb_list", "fan-card-image");
+        const cookie = await contentPage("GetCookies", {type: "json"});
+        const userId = (cookie || {})["DedeUserID"];
+        const total = parseInt(confirmSaveLocal["data"]);
+
+        await saveStorage({"fan-card-list": items});
+        await backgroundPage("SetFanCardConfig", {key: "UserId", value: userId});
+        await backgroundPage("SetFanCardConfig", {key: "Total", value: total});
+    }
+};
 
 document.getElementById("back").onclick = function() {
     // 返回上一页
