@@ -3,8 +3,9 @@
     "description": "Web端装扮工具 beta",
     "version": "0.0.0",
     "manifest_version": 3,
+    "options_page": "options/options.html",
     "permissions": [
-        "tabs", 
+        "tabs",
         "downloads",
         "storage",
         "contextMenus"

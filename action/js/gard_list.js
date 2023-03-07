@@ -15,22 +15,25 @@ async function getNowFanCardTotal() {
     }
 }
 
-
 export async function verifyLocalFanCardContent(nowTotal) {
     // 验证本地是否可覆盖
-    const localTotal = await backgroundPage("GetFanCardConfig", {key: "Total"});
-    const localUserId = await backgroundPage("GetFanCardConfig", {key: "UserId"});
+    const localUserIdPromise = backgroundPage("GetConfig", {path: "User", key: "UserId"});
+    const localTotalPromise = backgroundPage("GetConfig", {path: "FanCard", key: "Total"});
+    const localListPromise = backgroundPage("GetConfig", {path: "FanCard", key: "List"});
+    const cookiePromise = contentPage("GetCookies", {type: "json"});
 
-    const cookie = await contentPage("GetCookies", {type: "json"});
-    const localFanCard = getStorage("fan-card-list", []);
-    const nowUserId = (cookie || {})["DedeUserID"];
+    const nowUserId = (await cookiePromise || {})["DedeUserID"] || "-1";
+    const localUserId = (await localUserIdPromise) || "";
+    const localTotal = (await localTotalPromise) || -1;
+    const localList = (await localListPromise) || [];
 
     const exp1 = (nowUserId.toString() === localUserId.toString());
     const exp2 = (localTotal.toString() === nowTotal.toString());
-    const exp3 = (localFanCard.length === parseInt(nowTotal));
-    const exp4 = (localFanCard.length === parseInt(localTotal));
+    const exp3 = (localList.length === parseInt(nowTotal));
+    const exp4 = (localList.length === parseInt(localTotal));
+
     if (exp1 && exp2 && exp3 && exp4) {
-        return {code: 0, data: localFanCard, message: "可以从本地更新到页面"};
+        return {code: 0, data: localList, message: "可以从本地更新到页面"};
     }
     if (!exp4) {
         return {code: 3, data: [], message: "本地内容错误"};
@@ -42,10 +45,8 @@ function setFanCardToPage(elementId, items) {
     // 设置粉丝卡片到页面
     const root = document.getElementById(elementId);
     root.innerHTML = "";
-
     for (let i = 0; i < items.length; i++) {
-        const values = [items[i], "li", {}, {"own_num": true}];
-        const tag = CreateFanCardTag(...values);
+        const tag = CreateFanCardTag(items[i], "li");
         tag.id = items[i]["item_id"].toString();
         tag.dataset["item"] = JSON.stringify({
             "name": items[i]["name"],
@@ -61,11 +62,10 @@ function setFanCardToPage(elementId, items) {
         }
         root.append(tag);
     }
-
     return root
 }
 
-async function PageLoad(enableLocal=false) {
+async function LoadFanCardToPage(enableLocal=false) {
     // 加载页面
     const TotalRes = await getNowFanCardTotal() || {};
     if (TotalRes["code"] === -1) {
@@ -77,7 +77,6 @@ async function PageLoad(enableLocal=false) {
     const total = parseInt(TotalRes["data"] || 0);
 
     let localErr = false;
-
     if (enableLocal === true) {
         const LocalVerifyRes = await verifyLocalFanCardContent(total);
         if (LocalVerifyRes["code"] !== 0) {
@@ -123,19 +122,23 @@ async function PageLoad(enableLocal=false) {
 }
 
 window.onload = async function() {
-    // 加载页面
-    const localEnable = await backgroundPage("GetFanCardConfig", {key: "EnableLocal"});
-    const confirmSaveLocal = await PageLoad(localEnable);
-    if (confirmSaveLocal["ver"] === true) {
-        await MessageInfo({message: "粉丝卡片内容已保存到本地"});
-        const items = GetFanCardItems("garb_list", "fan-card-image");
-        const cookie = await contentPage("GetCookies", {type: "json"});
-        const userId = (cookie || {})["DedeUserID"];
-        const total = parseInt(confirmSaveLocal["data"]);
+    const cookie = await contentPage("GetCookies", {type: "json"});
+    const userId = (cookie || {})["DedeUserID"];
+    if (!userId) {
+        await MessageInfo({message: "未登录"});
+        window.location.href = "popup.html";
+    }
 
-        await saveStorage({"fan-card-list": items});
-        await backgroundPage("SetFanCardConfig", {key: "UserId", value: userId});
-        await backgroundPage("SetFanCardConfig", {key: "Total", value: total});
+    // 加载页面
+    const localEnable = await backgroundPage("GetConfig", {path: "FanCard", key: "EnableLocal"});
+    const confirmSaveLocal = await LoadFanCardToPage(localEnable);
+    if (confirmSaveLocal["ver"] === true) {
+        const items = GetFanCardItems("garb_list", "fan-card-image");
+        const total = parseInt(confirmSaveLocal["data"]);
+        await backgroundPage("SetConfig", {path: "User", key: "UserId", value: userId});
+        await backgroundPage("SetConfig", {path: "FanCard", key: "Total", value: total});
+        await backgroundPage("SetConfig", {path: "FanCard", key: "List", value: items});
+        await MessageInfo({message: "粉丝卡片内容已保存到本地"});
     }
 };
 
@@ -150,15 +153,23 @@ document.getElementById("sort").onclick = function() {
 };
 
 window.onclick = function(event) {
-    const root = document.getElementById("code-tips");
-    let target = event.target;
-    if(target.nodeName === "A") {
-        target = target.parentNode;
-    }
-    if (target.id !== "code-tips" && target.id !== "search") {
-        root.dataset["style"] = "hide";
-    }
+    console.log(1)
 };
+
+document.onclick = function(event) {
+    console.log(2)
+};
+
+    // window.onclick = function(event) {
+//     const root = document.getElementById("code-tips");
+//     let target = event.target;
+//     if(target.nodeName === "A") {
+//         target = target.parentNode;
+//     }
+//     if (target.id !== "code-tips" && target.id !== "search") {
+//         root.dataset["style"] = "hide";
+//     }
+// };
 
 
 (async function() {

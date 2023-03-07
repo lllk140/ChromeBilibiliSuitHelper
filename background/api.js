@@ -1,5 +1,6 @@
 import {getStorage, saveStorage} from "/assets/lib/chrome.js";
 import {FetchHttp} from "/background/request.js";
+import {configPath} from "/background/config-path.js";
 
 export async function updateScammer() {
     // 更新骗子名单
@@ -23,6 +24,7 @@ export async function updateScammer() {
     const version = (/版本(.*);/g).exec(scammerText)[1];
     const version_list = version.split(".");
     const old_version_list = old_version.split(".");
+
 
     if (version_list.length < old_version_list.length) {
         version_list.push("0");
@@ -76,29 +78,24 @@ export const backgroundPageApi = {
         return (scammer["list"] || []).indexOf(mid) === -1
     },
 
-    SetFanCardConfig: async function(message) {
-        // 设置FanCardConfig;
-        const config = getStorage("config", {});
-        const fanCardConfig = config["fan-card-config"] || {};
-        fanCardConfig[message["key"]] = message["value"];
-        await saveStorage({"config": fanCardConfig});
-    },
-
-    GetFanCardConfig: async function(message) {
-        // 获取FanCardConfig
-        // RequestSpeed: 每次请求的个数 | default:20;
-        // UserId: 粉丝卡片拥有者用户id;
-        // Total: 粉丝卡片总数;
-        const config = getStorage("config", {});
-        const fanCardConfig = config["fan-card-config"] || {};
-        return fanCardConfig[message["key"]] || (message["err"] || null);
-    },
-
-    // FanCardRequestSpeed: 每次请求的个数 | default:20;
-    // FanCardUserId: 装扮
     GetConfig: async function(message) {
-        // 获取配置
-        const config = getStorage("config", {});
-        return config[message["key"]] || null;
-    }
+        // 获取设置
+        const path = configPath[message["path"]];
+        const error = message["err"] || undefined;
+        if (!path) {return error;}
+        const key = path[message["key"]] || null;
+        if (key === undefined) {return error;}
+        return await getStorage(key.key, key.default);
+    },
+
+    SetConfig: async function(message) {
+        // 设置内容
+        const path = configPath[message["path"]];
+        if (!path) {return null;}
+        const key = path[message["key"]];
+        if (key === undefined) {return null;}
+        const config = {};
+        config[key.key] = message["value"]
+        return await saveStorage(config);
+    },
 }

@@ -12,16 +12,16 @@ export function GetFanCardItems(elementId, imageId="fan-card-image") {
     for (let i = 0; i < root.children.length; i++) {
         const tag = root.children[i];
         const item = JSON.parse(root.children[i].dataset["item"]);
-        if (imageId && (imageId instanceof String)) {
+        if (imageId && (typeof(imageId) === "string")) {
             const tagImage = tag.getElementsByClassName(imageId);
             if (tagImage.length !== 0) {
                 item["fan_share_image"] = tagImage[0].src;
             }
         }
+        items.push(item);
     }
     return items;
 }
-
 
 
 // ---------------------------------------
@@ -60,7 +60,7 @@ export function GetFanCardsList(total, ps, parseHandler) {
 }
 
 
-export function CreateFanCardTag(item, element, detail={}, option={}) {
+export function CreateFanCardTag(item, element, option={}, detail={}) {
     // 创建粉丝卡片标签
     function createCardText(text, className=[]) {
         // 创建粉丝卡片内容
@@ -97,7 +97,7 @@ export function CreateFanCardTag(item, element, detail={}, option={}) {
     const own_num = createCardText(padNum(item["own_num"], 3), own_numClass);
     card.append(name, numberTitle, number, dateTitle, date);
 
-    if (option["own_num"] === true) {
+    if (option["own_num"] === true || option["own_num"] === undefined) {
         card.appendChild(own_num);
     }
     card.appendChild(fanCardImage);

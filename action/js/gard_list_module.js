@@ -1,4 +1,3 @@
-import {padNum} from "/assets/lib/utils.js";
 import {contentPage, backgroundPage} from "/assets/lib/chrome.js";
 import {MessageInfo, MessageTips} from "/assets/lib/message.js";
 import {CreateFanCardTag} from "/action/js/module/fan-card.js";
@@ -94,8 +93,7 @@ export async function StartLoad() {
 
     const root = document.getElementById("garb_list");
     for (let i = 0; i < fanCards.length; i++) {
-        const values = [fanCards[i], "li", {}, {"own_num": true}];
-        const tag = CreateFanCardTag(...values);
+        const tag = CreateFanCardTag(fanCards[i], "li");
         tag.id = fanCards[i]["item_id"].toString();
         tag.dataset["item"] = JSON.stringify({
             "name": fanCards[i]["name"],
