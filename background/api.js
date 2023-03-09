@@ -4,13 +4,6 @@ import {configPath} from "/background/config-path.js";
 
 
 export const backgroundPageApi = {
-    VerifyScammer: async function(message) {
-        // 验证是不是骗子, 正常用户return true
-        let scammer = await getStorage("scammer", {});
-        const mid = (message["uid"]).toString();
-        return (scammer["list"] || []).indexOf(mid) === -1
-    },
-
     GetConfig: async function(message) {
         // 获取设置
         const path = configPath[message["path"]];
@@ -30,6 +23,13 @@ export const backgroundPageApi = {
         const config = {};
         config[key.key] = message["value"]
         return await saveStorage(config);
+    },
+
+    VerifyScammer: async function(message) {
+        // 验证是不是骗子, 正常用户return true
+        const scammer = await backgroundPageApi.GetConfig({path: "Scammer", key: "List"});
+        const mid = (message["uid"]).toString();
+        return (scammer || []).indexOf(mid) === -1
     },
 }
 

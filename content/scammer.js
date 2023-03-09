@@ -4,13 +4,11 @@ window.onload = async function() {
     const uid = window.location.pathname.split("/")[1];
     const flags = await backgroundPage("VerifyScammer", {"uid": uid});
 
-    console.log(uid)
-
     if (!flags) {
         const info = document.createElement("a");
         info.style.color = "red";
         info.innerText = "[装扮骗子, 注意防骗]";
-        info.href = "https://github.com/cyh946/kcz/";
+        info.href = "https://gitee.com/a18874107188/liar/";
 
         let timer = setInterval(function() {
             const root = document.getElementById("h-name");
