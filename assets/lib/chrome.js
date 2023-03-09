@@ -11,7 +11,6 @@ export function getStorage(key, err={}) {
     // 获取本地数据
     return new Promise(function (resolve, _) {
         chrome.storage.local.get([key], function(value) {
-            console.log(value)
             resolve(value[key] === undefined ? err : value[key]);
         });
     });

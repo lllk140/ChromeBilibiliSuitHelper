@@ -1,7 +1,8 @@
+const defaultScammerUrl = "https://gitee.com/a18874107188/liar/raw/master/content.json";
+
 
 export const configPath = {
     "User": {
-        // 用户信息, uid, access_key
         "UserId": {key: "UserContent-user_id", default: null},
         "AccessKey": {key: "UserContent-access_key", default: null},
     },
@@ -14,8 +15,9 @@ export const configPath = {
     },
 
     "Scammer": {
-        "Url": {key: "ScammerContentPath-url", default: null},
-        "Version": {key: "ScammerContentPath-version",default: 0},
+        "Url": {key: "ScammerContentPath-url", default: defaultScammerUrl},
+        "Version": {key: "ScammerContentPath-version",default: null},
+        "Time": {key: "ScammerContentPath-time",default: 0},
         "List": {key: "ScammerContentPath-list", default: []},
     }
 }

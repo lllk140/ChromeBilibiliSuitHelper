@@ -6,3 +6,4 @@ reverse.png https://www.iconfont.cn/collections/detail?cid=41824
 close.png https://www.iconfont.cn/collections/detail?cid=42993
 setting.png https://www.iconfont.cn/collections/detail?cid=10026
 download.png https://www.iconfont.cn/collections/detail?cid=24987
+tips.png https://www.iconfont.cn/collections/detail?cid=7077
