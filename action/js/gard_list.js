@@ -141,6 +141,8 @@ window.onload = async function() {
         await backgroundPage("SetConfig", {path: "FanCard", key: "List", value: items});
         await MessageInfo({message: "粉丝卡片内容已保存到本地"});
     }
+
+    document.getElementById("loading-box").style.display = "none";
 };
 
 document.getElementById("back").onclick = function() {
@@ -153,24 +155,17 @@ document.getElementById("sort").onclick = function() {
     window.location.href = "sort.html";
 };
 
+
 window.onclick = function(event) {
-    console.log(1)
+    const root = document.getElementById("code-tips");
+    let target = event.target;
+    if(target.nodeName === "A") {
+        target = target.parentNode;
+    }
+    if (target.id !== "code-tips" && target.id !== "search") {
+        root.dataset["style"] = "hide";
+    }
 };
-
-document.onclick = function(event) {
-    console.log(2)
-};
-
-    // window.onclick = function(event) {
-//     const root = document.getElementById("code-tips");
-//     let target = event.target;
-//     if(target.nodeName === "A") {
-//         target = target.parentNode;
-//     }
-//     if (target.id !== "code-tips" && target.id !== "search") {
-//         root.dataset["style"] = "hide";
-//     }
-// };
 
 
 (async function() {

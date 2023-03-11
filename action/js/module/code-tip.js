@@ -51,3 +51,49 @@ export function setInputValue(root, value, callback, timeout=10) {
     }, timeout);
     return timer
 }
+
+export function codeTips(value, funcObjs, detail=null) {
+    // api路径提示
+    const statement = (detail || {})["statement"] || "@";
+    const splitText = (detail || {})["split"] || ".";
+
+    if (value[0] !== statement) {return [];}
+
+    const valueSplit = value.slice(1).split(splitText);
+
+    let code_node = [], copyApi = funcObjs;
+
+    for (let i = 0; i < valueSplit.length; i++) {
+        const codeFrame = valueSplit[i];
+        if (i + 1 < valueSplit.length) {
+            if (!copyApi[codeFrame]) {
+                return [];
+            }
+            if (typeof copyApi[codeFrame] === "function") {
+                return [];
+            }
+            copyApi = copyApi[codeFrame];
+            continue;
+        }
+
+        for (const apiKey in copyApi) {
+            // const apiKeyFrame = apiKey.slice(0, codeFrame.length);
+            // if (codeFrame === apiKeyFrame) {
+            //     if (typeof copyApi[apiKey] === "function") {
+            //         code_node.push(apiKey + "()");
+            //     } else {
+            //         code_node.push(apiKey);
+            //     }
+            // }
+            // or
+            if (apiKey.indexOf(codeFrame) !== -1) {
+                if (typeof copyApi[apiKey] === "function") {
+                    code_node.push(apiKey + "()");
+                } else {
+                    code_node.push(apiKey);
+                }
+            }
+        }
+        return code_node
+    }
+}
