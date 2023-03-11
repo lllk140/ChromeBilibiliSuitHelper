@@ -1,6 +1,7 @@
 import {CreateFanCardTag, GetFanCardItems, GetFanCardsList} from "/action/js/module/fan-card.js";
-import {backgroundPage, getStorage, contentPage, saveStorage} from "/assets/lib/chrome.js";
-import {setInputValue, inputApi} from "/action/js/gard_list_module.js";
+import {backgroundPage, contentPage} from "/assets/lib/chrome.js";
+import {inputApi} from "/action/js/gard_list_module.js";
+import {setInputValue} from "/action/js/module/code-tip.js";
 import {MessageInfo, MessageJudge} from "/assets/lib/message.js";
 
 
@@ -176,19 +177,18 @@ document.onclick = function(event) {
     let old_code = null;
     let search_list = [];
 
+
     function onFocus(eid, func=function(_) {}) {
         // 监听光标信息
         const root = document.getElementById(eid);
-        let start, end;
+        let start = -1;
+        let end = -1;
 
         let timer = setInterval(function() {
             const selectionStart = root.selectionStart;
             const selectionEnd = root.selectionEnd;
 
-            const tips = document.getElementById("code-tips");
-
             if (!root.value) {
-                tips.dataset["style"] = "hide";
                 start = 0;
                 end = 0;
                 return null;

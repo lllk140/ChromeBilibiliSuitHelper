@@ -2,6 +2,7 @@
 
 window.onload = async function() {
     const uid = window.location.pathname.split("/")[1];
+    console.log(uid);
     const flags = await backgroundPage("VerifyScammer", {"uid": uid});
 
     if (!flags) {
@@ -12,7 +13,8 @@ window.onload = async function() {
 
         let timer = setInterval(function() {
             const root = document.getElementById("h-name");
-            root.title = "此用户在骗子名单中, 注意防骗"
+            root.title = "此用户在骗子名单中, 注意防骗";
+            console.log(root)
             if (root) {
                 root.appendChild(info);
                 clearInterval(timer);

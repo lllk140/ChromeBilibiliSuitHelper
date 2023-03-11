@@ -139,13 +139,6 @@ body {
 }
 
 
-.content-button {
-    position: relative;
-    width: 100%;
-    height: 50px;
-    border-top: 1px solid white;
-}
-
 /* -------------------------- */
 
 .assets-content-box {
@@ -234,10 +227,18 @@ body {
 
 /* --------------------------------------- */
 
-#load-all {
+.content-button {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    border-top: 1px solid white;
+}
+
+.content-button input {
     position: relative;
     user-select: none;
     float: right;
+    margin-left: 10px;
     height: 30px;
     border-style: none;
     outline: none;

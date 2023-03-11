@@ -42,7 +42,8 @@
                 "/content/scammer.js"
             ],
             "matches": [
-                "*://space.bilibili.com/*"
+                "*://space.bilibili.com/*",
+                "*://message.bilibili.com/*"
             ],
             "run_at": "document_idle"
         }

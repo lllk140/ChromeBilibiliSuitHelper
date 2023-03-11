@@ -31,6 +31,10 @@ window.onload = async function() {
         return null;
     }
 
+    document.getElementById("give-number").onclick = function() {
+        window.location.href = `fan_number.html?item_id=${item_id}`;
+    };
+
     const resObj = {
         GetSuitAssets: contentPage("GetSuitAssets", {item_id: item_id}),
         GetSuitBuyNum: contentPage("GetSuitBuyNum", {item_id: item_id}),
