@@ -22,7 +22,7 @@ window.onload = async function() {
             }
         }, null);
 
-        console.log(test)
+        console.log(test);
 
     }, 10, false);
 };

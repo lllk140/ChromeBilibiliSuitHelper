@@ -1,7 +1,5 @@
 import {padNum} from "/assets/lib/utils.js";
-import {contentPage, backgroundPage} from "/assets/lib/chrome.js";
-import {MessageInfo, MessageTips} from "/assets/lib/message.js";
-
+import {contentPage} from "/assets/lib/chrome.js";
 
 // ---------------------------------------
 
