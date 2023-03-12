@@ -52,14 +52,14 @@ export function setInputValue(root, value, callback, timeout=10) {
     return timer
 }
 
-export function codeTips(value, funcObjs, detail=null) {
+export function codeTips(code, funcObjs, detail=null) {
     // api路径提示
     const statement = (detail || {})["statement"] || "@";
     const splitText = (detail || {})["split"] || ".";
 
-    if (value[0] !== statement) {return [];}
+    if (code[0] !== statement) {return [];}
 
-    const valueSplit = value.slice(1).split(splitText);
+    const valueSplit = code.slice(1).split(splitText);
 
     let code_node = [], copyApi = funcObjs;
 
@@ -79,21 +79,27 @@ export function codeTips(value, funcObjs, detail=null) {
         for (const apiKey in copyApi) {
             // const apiKeyFrame = apiKey.slice(0, codeFrame.length);
             // if (codeFrame === apiKeyFrame) {
+            //     if (codeFrame.length !== 0) {
+            //         code = code.slice(0, -codeFrame.length);
+            //     }
             //     if (typeof copyApi[apiKey] === "function") {
-            //         code_node.push(apiKey + "()");
+            //         code_node.push({code: code, tips: apiKey + "()"});
             //     } else {
-            //         code_node.push(apiKey);
+            //         code_node.push({code: code, tips: apiKey});
             //     }
             // }
             // or
             if (apiKey.indexOf(codeFrame) !== -1) {
+                if (codeFrame.length !== 0) {
+                    code = code.slice(0, -codeFrame.length);
+                }
                 if (typeof copyApi[apiKey] === "function") {
-                    code_node.push(apiKey + "()");
+                    code_node.push({code: code, tips: apiKey + "()"});
                 } else {
-                    code_node.push(apiKey);
+                    code_node.push({code: code, tips: apiKey});
                 }
             }
         }
-        return code_node
+        return code_node;
     }
 }

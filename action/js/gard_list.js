@@ -1,7 +1,7 @@
 import {CreateFanCardTag, GetFanCardItems, GetFanCardsList} from "/action/js/module/fan-card.js";
 import {backgroundPage, contentPage} from "/assets/lib/chrome.js";
 import {inputApi} from "/action/js/gard_list_module.js";
-import {setInputValue} from "/action/js/module/code-tip.js";
+import {setInputValue, ListenerFocus, codeTips} from "/action/js/module/code-tip.js";
 import {MessageInfo, MessageJudge} from "/assets/lib/message.js";
 
 
@@ -172,122 +172,49 @@ window.onclick = function(event) {
     let old_code = null;
     let search_list = [];
 
+    const root = document.getElementById("search");
+    ListenerFocus(root, function(selectionStart, selectionEnd) {
+        const tipsTag = document.getElementById("code-tips");
 
-    function onFocus(eid, func=function(_) {}) {
-        // 监听光标信息
-        const root = document.getElementById(eid);
-        let start = -1;
-        let end = -1;
-
-        let timer = setInterval(function() {
-            const selectionStart = root.selectionStart;
-            const selectionEnd = root.selectionEnd;
-
-            if (!root.value) {
-                start = 0;
-                end = 0;
-                return null;
-            }
-
-            // if (root !== document.activeElement) {
-            //     tips.dataset["style"] = "hide";
-            //     return null;
-            // }
-
-            if (selectionStart === start && selectionEnd === end) {
-                return null;
-            }
-
-            const closeYN = func({
-                root: root, location: {s: selectionStart, e: selectionEnd}
-            });
-
-            start = selectionStart;
-            end = selectionEnd;
-
-            if (closeYN === -1) {
-                clearInterval(timer);
-            }
-        }, 50);
-        return timer;
-    }
-
-    onFocus("search", function(event) {
-        const tips = document.getElementById("code-tips");
-
-        const _ls = event.location.s;
-        const _le = event.location.e;
-        const _value = event.root.value;
-
-        let value = _ls === _le ? _value.slice(0, _le) : _value.slice(_ls, _le);
-
-        if (value[0] !== "@") {
+        if (selectionEnd === 0 && selectionStart === 0) {
+            tipsTag.dataset["style"] = "hide";
             return null;
         }
 
-        const valueSplit = value.slice(1).split(".");
-
-        const code_node = [];
-        let header = [];
-        let copyApi = inputApi;
-        if (valueSplit.length === 1) {
-            for (const code in inputApi) {
-                code_node.push(code);
-            }
-        } else {
-            header = valueSplit.slice(0, -1);
-            for (let i = 0; i < header.length; i++) {
-                const key = header[i];
-                if (!copyApi[key]) {
-                    return []
-                }
-                if (copyApi[key] instanceof Object) {
-                    copyApi = copyApi[key];
-                } else {
-                    return []
-                }
-            }
-
-            for (const code in copyApi) {
-                code_node.push(code);
-            }
+        let value = root.value.slice(selectionStart, selectionEnd);
+        if (selectionStart === selectionEnd) {
+            value = root.value.slice(0, selectionEnd);
         }
 
-        let tail = valueSplit.slice(-1)[0];
-        const code_list = []
+        const code_list = codeTips(value, inputApi);
+        console.log(code_list);
 
-        for (let i = 0; i < code_node.length; i++) {
-            const code = code_node[i].slice(0, tail.length);
-            if (code === tail) {
-                const joinText = header.join(".");
-                const node = !joinText ? "" : joinText + ".";
-
-                let tailText = ".";
-                if (typeof copyApi[code_node[i]] === "function") {
-                    tailText = "()";
-                }
-                code_list.push(`@${node}${code_node[i]}${tailText}`);
-            }
-        }
-
-        const page_code_list = code_list.slice(0, 5);
-
-        tips.innerHTML = "";
-        for (let i = 0; i < page_code_list.length; i++) {
+        tipsTag.innerHTML = "";
+        for (let i = 0; i < code_list.length; i++) {
             const textTag = document.createElement("a");
-            textTag.innerText = page_code_list[i];
+            const tips = code_list[i]["tips"];
+            textTag.dataset["code"] = code_list[i]["code"] + tips;
+            textTag.innerText = tips;
             textTag.onclick = function() {
                 const input = document.getElementById("search");
-                setInputValue(input, this.innerText, true);
+                setInputValue(input, this.dataset["code"], function(root) {
+                    if (root.value.slice(-2) === "()") {
+                        const s = root.selectionStart - 1;
+                        const e = root.selectionEnd - 1;
+                        root.setSelectionRange(s, e);
+                    }
+                });
             }
-            tips.appendChild(textTag);
+            tipsTag.appendChild(textTag);
         }
-        tips.dataset["style"] = "show";
 
-        if (tips.childNodes.length !== 0) {
-            tips.childNodes[0]["classList"].add("choose-code");
+        if (tipsTag.childNodes.length !== 0) {
+            tipsTag.childNodes[0]["classList"].add("choose-code");
         }
-    });
+
+        tipsTag.dataset["style"] = "show";
+
+    }, 10, false);
 
     function searchNext() {
         if (search_list.length === 0) {
@@ -370,8 +297,15 @@ window.onclick = function(event) {
         const input = document.getElementById("search");
 
         if (event.key === "Tab") {
-            const resValue = codeTags.length !== 0 ? codeTags[0].innerText : input.value;
-            setInputValue(input, resValue, true);
+            const resValue = codeTags.length !== 0 ? codeTags[0].dataset["code"] : input.value;
+
+            setInputValue(input, resValue, function(root) {
+                if (root.value.slice(-2) === "()") {
+                    const s = root.selectionStart - 1;
+                    const e = root.selectionEnd - 1;
+                    root.setSelectionRange(s, e);
+                }
+            });
             return null;
         }
 
