@@ -111,10 +111,6 @@ export const inputApi = {
             window.location.reload();
             return -1;
         },
-        "update": function(_) {
-            StartLoad().then()
-            return -1;
-        }
     },
 
     card: {

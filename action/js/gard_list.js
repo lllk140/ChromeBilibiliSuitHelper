@@ -1,8 +1,9 @@
 import {CreateFanCardTag, GetFanCardItems, GetFanCardsList} from "/action/js/module/fan-card.js";
 import {backgroundPage, contentPage} from "/assets/lib/chrome.js";
 import {inputApi} from "/action/js/gard_list_module.js";
-import {setInputValue, ListenerFocus, codeTips} from "/action/js/module/code-tip.js";
+import {setInputValue, ListenerFocus, codeTips, extractApi} from "/action/js/module/code-tip.js";
 import {MessageInfo, MessageJudge} from "/assets/lib/message.js";
+
 
 
 async function getNowFanCardTotal() {
@@ -250,32 +251,12 @@ window.onclick = function(event) {
 
         console.log("onkeydown:", value);
 
-        let reString = value.match(/@(.*?)\(/);
-        if (!reString) {
-            reString = ["", "search.string.name"];
-        }
-
-        const reSearchValue = value.slice(reString[0].length-1);
-        let searchValueArray = reSearchValue.match(/\((.*)\)/);
-
-        if (!searchValueArray) {
-            searchValueArray = ["", value];
-        }
-
-        const valueSplit = reString[1].split(".");
-        let copyApi = inputApi;
-        for (let i = 0; i < valueSplit.length; i++) {
-            if (!copyApi[valueSplit[i]]) {
-                return false;
-            }
-            copyApi = copyApi[valueSplit[i]];
-        }
-
-        if (typeof copyApi !== "function") {
+        const content = extractApi(value, inputApi);
+        if (content === false) {
             return false;
         }
 
-        search_list = (copyApi || function(_) {return -1})(searchValueArray[1]);
+        search_list = content["func"](content["value"]);
         if (search_list === -1) {
             old_code = "";
             return false;

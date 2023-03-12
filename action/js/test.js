@@ -29,8 +29,19 @@ window.onload = async function() {
 
 
 document.getElementById("test").onclick = async function() {
-    const data1 = await backgroundPage("GetConfig", {path: "FanCard", key: "EnableLocal"});
-    await backgroundPage("SetConfig", {path: "FanCard", key: "EnableLocal", value: !data1});
-    const data = await backgroundPage("GetConfig", {path: "FanCard", key: "EnableLocal"});
-    console.log(data);
+    // const data1 = await backgroundPage("GetConfig", {path: "FanCard", key: "EnableLocal"});
+    // await backgroundPage("SetConfig", {path: "FanCard", key: "EnableLocal", value: !data1});
+    // const data = await backgroundPage("GetConfig", {path: "FanCard", key: "EnableLocal"});
+    // console.log(data);
+
+    function test(value) {
+        return new Promise(function(resolve, reject) {
+            resolve(value);
+        })
+    }
+
+    test(1111).then(function(root) {
+        console.log(root)
+    });
+    console.log("1");
 }

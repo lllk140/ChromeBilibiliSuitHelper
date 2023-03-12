@@ -1,4 +1,3 @@
-
 const nullFunc = function(..._) {return null};
 
 export function ListenerFocus(root, callback, timeout=50, init=true) {
@@ -43,16 +42,11 @@ export function setInputValue(root, value, callback, timeout=10) {
         clearInterval(timer);
         root.focus();
         (callback || nullFunc)(root);
-        // if (input.value.slice(-2) === "()" && auto) {
-        //     const s = input.selectionStart - 1;
-        //     const e = input.selectionEnd - 1;
-        //     input.setSelectionRange(s, e);
-        // }
     }, timeout);
     return timer
 }
 
-export function codeTips(code, funcObjs, detail=null) {
+export function codeTips(code, apiObjs, detail=null) {
     // api路径提示
     const statement = (detail || {})["statement"] || "@";
     const splitText = (detail || {})["split"] || ".";
@@ -61,7 +55,7 @@ export function codeTips(code, funcObjs, detail=null) {
 
     const valueSplit = code.slice(1).split(splitText);
 
-    let code_node = [], copyApi = funcObjs;
+    let code_node = [], copyApi = apiObjs;
 
     for (let i = 0; i < valueSplit.length; i++) {
         const codeFrame = valueSplit[i];
@@ -77,17 +71,7 @@ export function codeTips(code, funcObjs, detail=null) {
         }
 
         for (const apiKey in copyApi) {
-            // const apiKeyFrame = apiKey.slice(0, codeFrame.length);
-            // if (codeFrame === apiKeyFrame) {
-            //     if (codeFrame.length !== 0) {
-            //         code = code.slice(0, -codeFrame.length);
-            //     }
-            //     if (typeof copyApi[apiKey] === "function") {
-            //         code_node.push({code: code, tips: apiKey + "()"});
-            //     } else {
-            //         code_node.push({code: code, tips: apiKey});
-            //     }
-            // }
+            // if (codeFrame === apiKey.slice(0, codeFrame.length)) {...}
             // or
             if (apiKey.indexOf(codeFrame) !== -1) {
                 if (codeFrame.length !== 0) {
@@ -102,4 +86,35 @@ export function codeTips(code, funcObjs, detail=null) {
         }
         return code_node;
     }
+}
+
+export function extractApi(code, apiObjs, detail=null) {
+    // 提取方法
+    const statement = (detail || {})["statement"] || "@";
+    const splitText = (detail || {})["split"] || ".";
+
+    let reString = code.match(new RegExp(`${statement}(.*?)\\(`));
+    if (!reString) {
+        reString = ["", "search.string.name"];
+    }
+
+    const reSearchValue = code.slice(reString[0].length-1);
+    let searchValueArray = reSearchValue.match(/\((.*)\)/);
+
+    if (!searchValueArray) {
+        searchValueArray = ["", code];
+    }
+    const valueSplit = reString[1].split(splitText);
+    let copyApi = apiObjs;
+    for (let i = 0; i < valueSplit.length; i++) {
+        if (!copyApi[valueSplit[i]]) {
+            return false;
+        }
+        copyApi = copyApi[valueSplit[i]];
+    }
+
+    if (typeof copyApi !== "function") {
+        return false;
+    }
+    return {func: copyApi, value: searchValueArray[1]};
 }
